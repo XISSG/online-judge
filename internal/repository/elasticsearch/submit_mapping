@@ -1,0 +1,38 @@
+PUT /question/
+{
+  "settings": {
+    "analysis": {
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
+    }
+  },
+  "mappings": {
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "judge_info": {
+        "type": "text"
+        "analyzer: "ik_max_word"
+      },
+      "status": {
+        "type": "text"
+        "analyzer: "ik_smart"
+      },
+      "question_id": {
+        "type": "integer"
+      },
+      "user_id": {
+        "type": "integer"
+      },
+      "create_time": {
+        "type": "date",
+        "format": "strict_date_optional_time"
+      },
+      "update_time": {
+        "type": "date",
+        "format": "strict_date_optional_time"
+      }
+    }
+  }
+}

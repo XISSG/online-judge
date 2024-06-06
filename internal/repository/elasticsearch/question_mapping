@@ -1,0 +1,58 @@
+PUT /question/
+{
+  "settings": {
+    "analysis": {
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart"
+    }
+  },
+  "mappings": {
+    "properties": {
+      "id": {
+        "type": "keyword"
+      },
+      "title": {
+        "type": "text",
+        "analyzer": "ik_smart"
+      },
+      "content": {
+        "type": "text",
+        "analyzer": "ik_max_word"
+      },
+      "tags": {
+        "type": "text",
+        "analyzer": "ik_smart"
+      },
+      "answer": {
+        "type": "text",
+        "analyzer": "ik_max_word"
+      },
+      "submit_num": {
+        "type": "integer"
+      },
+      "accept_num": {
+        "type": "integer"
+      },
+      "judge_case": {
+        "type": "text"
+      },
+      "judge_config": {
+        "type": "text"
+      },
+      "thum_num": {
+        "type": "integer"
+      },
+      "user_id": {
+        "type": "keyword"
+      },
+      "create_time": {
+        "type": "date",
+        "format": "strict_date_optional_time"
+      },
+      "update_time": {
+        "type": "date",
+        "format": "strict_date_optional_time"
+      }
+    }
+  }
+}

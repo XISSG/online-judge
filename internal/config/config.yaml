@@ -1,0 +1,26 @@
+Elasticsearch:
+  addresses: [ "http://127.0.0.1:9200" ]
+  username: ""
+  password: ""
+Database:
+  username: root
+  password: root
+  host: 127.0.0.1
+  port: 3306
+  db_name: oj
+  max_idle_conns: 10
+  max_open_conns: 100
+  conn_max_lifetime: 3600
+Redis:
+  host: 127.0.0.1
+  port: 6379
+  password: ""
+  db: 0
+RabbitMQ:
+  username: guest
+  password: guest
+  host: 127.0.0.1
+  port: 5672
+Server:
+  host: 127.0.0.1
+  port: 8082

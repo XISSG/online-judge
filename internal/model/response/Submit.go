@@ -1,0 +1,17 @@
+package response
+
+type Submit struct {
+	ID int `json:"id" gorm:"column id;type varchar(256); primaryKey"`
+	//"判题信息json对象(包含上面的枚举值)
+	JudgeResult []string `json:"judge_info" gorm:"column judge_info; type: text;"`
+	//"判题状态（0-待判题,1-判题中,2-成功,3-失败)",
+	Status int `json:"status" gorm:"column status; type: int; default: 0; not null"`
+	//"判题id"
+	QuestionId int `json:"question_id" gorm:"index; column question_id; type: varchar(256); not null"`
+	//"创建用户id"
+	UserId int `json:"user_id" gorm:"index; column user_id; type: varchar(256); not null"`
+	//"创建时间"
+	CreateTime string `json:"create_time" gorm:"column create_time; type: datetime; not null"`
+	//"更新时间"
+	UpdateTime string `json:"update_time" gorm:"column update_time; type: datetime; not null"`
+}
