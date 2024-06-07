@@ -6,22 +6,15 @@ import (
 )
 
 func (mysql *MysqlClient) CreateUser(user *entity.User) error {
-	tx := mysql.Begin()
-	tx.Model("user").Create(user)
-	if tx.Error != nil {
-		tx.Rollback()
-		return tx.Error
+	err := createData[entity.User](mysql, constant.USER_TABLE, user)
+	if err != nil {
+		return err
 	}
-	tx.Commit()
 	return nil
 }
 
-func (mysql *MysqlClient) GetUserById(userId string) *entity.User {
-	var user *entity.User
-	tx := mysql.Model("user").Where("id = ?", userId).First(&user)
-	if tx.Error != nil {
-		return nil
-	}
+func (mysql *MysqlClient) GetUserById(userId int) *entity.User {
+	user := getDataById[entity.User](mysql, constant.USER_TABLE, userId)
 	return user
 }
 
@@ -44,30 +37,11 @@ func (mysql *MysqlClient) GetUserListByName(userName string) []*entity.User {
 	return users
 }
 
-func (mysql *MysqlClient) UpdateUserPassword(userId string, password string) error {
-	tx := mysql.Begin()
-	tx.Model("user").Where("id = ?", userId).Update("password", password)
-	if tx.Error != nil {
-		tx.Rollback()
-		return tx.Error
-	}
-	tx.Commit()
-	return nil
+func (mysql *MysqlClient) UpdateUser(userId int, data *entity.User) error {
+	return updateDataById[entity.User](mysql, constant.USER_TABLE, userId, data)
 }
 
-func (mysql *MysqlClient) UpdateUserAvatar(userId string, avatar string) error {
-
-	tx := mysql.Begin()
-	tx.Model("user").Where("id = ?", userId).Update("avatar_url", avatar)
-	if tx.Error != nil {
-		tx.Rollback()
-		return tx.Error
-	}
-	tx.Commit()
-	return nil
-}
-
-func (mysql *MysqlClient) BanUser(userId string) error {
+func (mysql *MysqlClient) BanUser(userId int) error {
 	tx := mysql.Begin()
 	tx.Model("user").Where("id = ?", userId).Update("user_role", constant.BAN)
 	if tx.Error != nil {
@@ -78,13 +52,10 @@ func (mysql *MysqlClient) BanUser(userId string) error {
 	return nil
 }
 
-func (mysql *MysqlClient) DeleteUser(userId string) error {
-	tx := mysql.Begin()
-	tx.Model("user").Where("id = ?", userId).Update("is_delete", 1)
-	if tx.Error != nil {
-		tx.Rollback()
-		return tx.Error
+func (mysql *MysqlClient) DeleteUser(userId int) error {
+	err := deleteDataById(mysql, constant.USER_TABLE, userId)
+	if err != nil {
+		return err
 	}
-	tx.Commit()
 	return nil
 }

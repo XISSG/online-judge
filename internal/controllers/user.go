@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/xissg/online-judge/internal/model/request"
 	"github.com/xissg/online-judge/internal/service"
+	"strconv"
 )
 
 type UserHandler struct {
@@ -54,9 +55,10 @@ func (r *UserHandler) login(ctx *gin.Context) {
 }
 
 func (r *UserHandler) getUserList(ctx *gin.Context) {
-	id := ctx.Query("id")
+	idStr := ctx.Query("id")
+	id, _ := strconv.Atoi(idStr)
 	name := ctx.Query("name")
-	if id != "" {
+	if idStr != "" {
 		user := r.userService.GetUserById(id)
 		ctx.JSON(200, user)
 		return

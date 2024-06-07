@@ -7,7 +7,7 @@ import (
 )
 
 type RabbitMQClient struct {
-	*amqp.Connection
+	client *amqp.Connection
 }
 
 func NewRabbitMQClient(cfg config.RabbitMQConfig) *RabbitMQClient {
@@ -17,6 +17,6 @@ func NewRabbitMQClient(cfg config.RabbitMQConfig) *RabbitMQClient {
 		panic(err)
 	}
 	return &RabbitMQClient{
-		conn,
+		client: conn,
 	}
 }

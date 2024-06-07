@@ -5,7 +5,7 @@ import (
 )
 
 type DockerClient struct {
-	*client.Client
+	client *client.Client
 }
 
 func NewDockerClient() *DockerClient {
@@ -14,6 +14,6 @@ func NewDockerClient() *DockerClient {
 		panic(err)
 	}
 	return &DockerClient{
-		cli,
+		client: cli,
 	}
 }

@@ -17,6 +17,6 @@ type UpdateUser struct {
 }
 
 type Body struct {
-	ID   string `json:"id"`
+	ID   int    `json:"id"`
 	Data string `json:"data"`
 }

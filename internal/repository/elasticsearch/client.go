@@ -5,11 +5,11 @@ import (
 	"github.com/xissg/online-judge/internal/config"
 )
 
-type ElasticsearchClient struct {
-	Client *elasticsearch.TypedClient
+type ESClient struct {
+	client *elasticsearch.TypedClient
 }
 
-func NewElasticSearchClient(cfg config.ElasticsearchConfig) *ElasticsearchClient {
+func NewElasticSearchClient(cfg config.ElasticsearchConfig) *ESClient {
 	esCfg := elasticsearch.Config{
 		Addresses: cfg.Addresses,
 		Username:  cfg.Username,
@@ -20,7 +20,7 @@ func NewElasticSearchClient(cfg config.ElasticsearchConfig) *ElasticsearchClient
 		panic(err)
 	}
 
-	return &ElasticsearchClient{
-		Client: client,
+	return &ESClient{
+		client: client,
 	}
 }

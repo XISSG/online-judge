@@ -6,28 +6,24 @@ import (
 )
 
 func (mysql *MysqlClient) CreateSubmit(submit *entity.Submit) error {
-	tx := mysql.Begin()
-	tx.Model("submit").Create(submit)
-	if tx.Error != nil {
-		tx.Rollback()
-		return tx.Error
+	err := createData[entity.Submit](mysql, constant.SUBMIT_TABLE, submit)
+	if err != nil {
+		return err
 	}
-	tx.Commit()
 	return nil
 }
 
 func (mysql *MysqlClient) GetSubmitById(submitId int) *entity.Submit {
-	var submit *entity.Submit
-	mysql.Model("submit").First(&submit, submitId)
-	return submit
+	return getDataById[entity.Submit](mysql, constant.SUBMIT_TABLE, submitId)
 }
 
+func (mysql *MysqlClient) GetSubmitList(page, pageSize int) (submitList []*entity.Submit) {
+	return getDataList[entity.Submit](mysql, constant.SUBMIT_TABLE, page, pageSize)
+}
 func (mysql *MysqlClient) DeleteSubmit(submitId int) error {
-	tx := mysql.Begin()
-	tx.Model("submit").Where("id = ? ", submitId).Update("is_delete", constant.DELETED)
-	if tx.Error != nil {
-		tx.Rollback()
-		return tx.Error
+	err := deleteDataById(mysql, constant.SUBMIT_TABLE, submitId)
+	if err != nil {
+		return err
 	}
 	return nil
 }

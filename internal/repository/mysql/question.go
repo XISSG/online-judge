@@ -1,43 +1,57 @@
 package mysql
 
 import (
+	"errors"
 	"github.com/xissg/online-judge/internal/constant"
 	"github.com/xissg/online-judge/internal/model/entity"
 )
 
 func (mysql *MysqlClient) CreateQuestion(question *entity.Question) error {
-	tx := mysql.Begin()
-	tx.Model("question").Create(question)
-	if tx.Error != nil {
-		tx.Rollback()
-		return tx.Error
+	err := createData[entity.Question](mysql, constant.QUESTION_TABLE, question)
+	if err != nil {
+		return err
 	}
-	tx.Commit()
 	return nil
 }
 
 func (mysql *MysqlClient) GetQuestionById(questionId int) *entity.Question {
-	var question *entity.Question
-	mysql.Model("question").First(&question, questionId)
+	question := getDataById[entity.Question](mysql, constant.QUESTION_TABLE, questionId)
 	return question
 }
 
+func (mysql *MysqlClient) GetQuestionList(page, pageSize int) (questionList []*entity.Question) {
+	return getDataList[entity.Question](mysql, constant.QUESTION_TABLE, page, pageSize)
+}
 func (mysql *MysqlClient) UpdateQuestion(question *entity.Question) error {
-	tx := mysql.Begin()
-	tx.Model("question").Where("id = ? ", question.ID).Updates(*question)
-	if tx.Error != nil {
-		tx.Rollback()
-		return tx.Error
+	err := updateDataById[entity.Question](mysql, constant.QUESTION_TABLE, question.ID, question)
+	if err != nil {
+		return err
 	}
 	return nil
 }
 
 func (mysql *MysqlClient) DeleteQuestion(questionId int) error {
-	tx := mysql.Begin()
-	tx.Model("question").Where("id = ? ", questionId).Update("is_delete", constant.DELETED)
-	if tx.Error != nil {
-		tx.Rollback()
-		return tx.Error
+	err := deleteDataById[entity.Question](mysql, constant.QUESTION_TABLE, questionId)
+	if err != nil {
+		return err
 	}
 	return nil
+}
+
+func (mysql *MysqlClient) UpdateQuestionAcceptNum(questionId int) error {
+	data := getDataById[entity.Question](mysql, constant.QUESTION_TABLE, questionId)
+	if data == nil {
+		return errors.New("no data for question")
+	}
+	data.AcceptNum++
+	return updateDataById[entity.Question](mysql, constant.QUESTION_TABLE, questionId, data)
+}
+
+func (mysql *MysqlClient) UpdateQuestionSubmitNum(questionId int) error {
+	data := getDataById[entity.Question](mysql, constant.QUESTION_TABLE, questionId)
+	if data == nil {
+		return errors.New("no data for question")
+	}
+	data.SubmitNum++
+	return updateDataById[entity.Question](mysql, constant.QUESTION_TABLE, questionId, data)
 }

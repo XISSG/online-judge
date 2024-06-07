@@ -18,8 +18,6 @@ type Question struct {
 	JudgeCase string `json:"judge_case" gorm:"column judge_case; type text"`
 	// "判题配置json对象"
 	JudgeConfig string `json:"judge_config" gorm:"column judge_config; type text"`
-	// "点赞数"
-	ThumNum int `json:"thum_num" gorm:"column thum_num; type int; not null;default: 0"`
 	// "创建用户id"
 	UserId int `json:"user_id" gorm:"index; column user_id;type varchar(256); not null"`
 	// "创建时间"

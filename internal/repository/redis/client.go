@@ -7,7 +7,7 @@ import (
 )
 
 type RedisClient struct {
-	*redis.Client
+	client *redis.Client
 }
 
 func NewRedisClient(cfg config.RedisConfig) *RedisClient {
@@ -18,6 +18,6 @@ func NewRedisClient(cfg config.RedisConfig) *RedisClient {
 		DB:       cfg.DB,       // 默认DB 0
 	})
 	return &RedisClient{
-		rdb,
+		client: rdb,
 	}
 }

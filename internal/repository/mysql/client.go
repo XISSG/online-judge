@@ -9,7 +9,7 @@ import (
 )
 
 type MysqlClient struct {
-	*gorm.DB
+	client *gorm.DB
 }
 
 func NewMysqlClient(cfg config.DatabaseConfig) *MysqlClient {
@@ -33,6 +33,6 @@ func NewMysqlClient(cfg config.DatabaseConfig) *MysqlClient {
 	sqlDb.SetConnMaxLifetime(cfg.ConnMaxLifetime) //设置最大连接时间
 
 	return &MysqlClient{
-		db,
+		client: db,
 	}
 }

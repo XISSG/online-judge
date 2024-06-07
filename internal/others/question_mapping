@@ -19,7 +19,7 @@ PUT /question/
         "type": "text",
         "analyzer": "ik_max_word"
       },
-      "tags": {
+      "tag": {
         "type": "text",
         "analyzer": "ik_smart"
       },
@@ -37,10 +37,7 @@ PUT /question/
         "type": "text"
       },
       "judge_config": {
-        "type": "text"
-      },
-      "thum_num": {
-        "type": "integer"
+        "type": "object"
       },
       "user_id": {
         "type": "keyword"

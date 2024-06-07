@@ -1,4 +1,4 @@
-PUT /question/
+PUT /submit/
 {
   "settings": {
     "analysis": {
@@ -12,12 +12,12 @@ PUT /question/
         "type": "integer"
       },
       "judge_info": {
-        "type": "text"
-        "analyzer: "ik_max_word"
+        "type": "text",
+        "analyzer": "ik_max_word"
       },
       "status": {
-        "type": "text"
-        "analyzer: "ik_smart"
+        "type": "text",
+        "analyzer": "ik_smart"
       },
       "question_id": {
         "type": "integer"

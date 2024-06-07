@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-func Snowflake() int64 {
+func Snowflake() int {
 	nodeID := int64(1)
 
 	// 创建一个雪花节点
@@ -16,5 +16,5 @@ func Snowflake() int64 {
 
 	// 生成一个唯一 ID
 	id := node.Generate()
-	return id.Int64()
+	return int(id.Int64())
 }

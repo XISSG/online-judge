@@ -9,11 +9,11 @@ import (
 
 type UserService interface {
 	CreateUser(userRequest *request.User) error
-	GetUserById(userId string) *response.User
+	GetUserById(userId int) *response.User
 	GetUserByUsername(username string) *response.User
-	GetUserListByUsername(username string) []*response.User
-	UpdateUserPassword(userId, password string) error
-	UpdateUserAvatar(userId, avatar string) error
+	GetUserListByUsername(username int) []*response.User
+	UpdateUserPassword(userId int, password string) error
+	UpdateUserAvatar(userId int, avatar string) error
 	DeleteUserById(userId string) error
 	BanUserById(userId string) error
 	CheckUser(userName, password string) bool
@@ -38,12 +38,12 @@ func (s *userService) CreateUser(userRequest *request.User) error {
 	return nil
 }
 
-func (s *userService) GetUserById(userId string) *response.User {
+func (s *userService) GetUserById(userId int) *response.User {
 	user := s.mysql.GetUserById(userId)
 	if user == nil {
 		return nil
 	}
-	userResponse := utils.ConvertUseResponse(user)
+	userResponse := utils.ConvertUserResponse(user)
 	return userResponse
 }
 func (s *userService) GetUserByUsername(username string) *response.User {
@@ -51,7 +51,7 @@ func (s *userService) GetUserByUsername(username string) *response.User {
 	if user == nil {
 		return nil
 	}
-	return utils.ConvertUseResponse(user)
+	return utils.ConvertUserResponse(user)
 }
 
 func (s *userService) GetUserListByUsername(username string) []*response.User {
@@ -62,14 +62,14 @@ func (s *userService) GetUserListByUsername(username string) []*response.User {
 	}
 
 	for i := range users {
-		userResponse := utils.ConvertUseResponse(users[i])
+		userResponse := utils.ConvertUserResponse(users[i])
 		userResponses = append(userResponses, userResponse)
 	}
 
 	return userResponses
 }
 
-func (s *userService) UpdateUserPassword(userId, password string) error {
+func (s *userService) UpdateUserPassword(userId int, password string) error {
 	password = utils.MD5Crypt(password)
 	err := s.mysql.UpdateUserPassword(userId, password)
 	if err != nil {
@@ -78,7 +78,7 @@ func (s *userService) UpdateUserPassword(userId, password string) error {
 	return nil
 }
 
-func (s *userService) UpdateUserAvatar(userId, avatar string) error {
+func (s *userService) UpdateUserAvatar(userId int, avatar string) error {
 	err := s.mysql.UpdateUserAvatar(userId, avatar)
 	if err != nil {
 		return err
@@ -86,7 +86,7 @@ func (s *userService) UpdateUserAvatar(userId, avatar string) error {
 	return nil
 }
 
-func (s *userService) DeleteUserById(userId string) error {
+func (s *userService) DeleteUserById(userId int) error {
 	err := s.mysql.DeleteUser(userId)
 	if err != nil {
 		return err
@@ -94,7 +94,7 @@ func (s *userService) DeleteUserById(userId string) error {
 	return nil
 }
 
-func (s *userService) BanUserById(userId string) error {
+func (s *userService) BanUserById(userId int) error {
 	err := s.mysql.BanUser(userId)
 	if err != nil {
 		return err

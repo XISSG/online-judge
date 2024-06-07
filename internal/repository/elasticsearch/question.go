@@ -1,67 +1,45 @@
 package elasticsearch
 
 import (
-	"context"
-	"encoding/json"
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	"github.com/xissg/online-judge/internal/constant"
 	"github.com/xissg/online-judge/internal/model/response"
-	"log"
-	"strconv"
 )
 
-func (es *ElasticsearchClient) IndexQuestions(question *response.Question) error {
-	res, err := es.Client.Index("question").
-		Id(strconv.Itoa(question.ID)).
-		Document(*question).
-		Do(context.Background())
-
-	if err != nil {
-		return err
-	}
-
-	log.Println(res.Result)
-	return nil
+func (es *ESClient) IndexQuestion(question *response.Question) error {
+	return indexDoc[response.Question](es, constant.QUESTION_INDEX, question.ID, question)
 }
 
-func (es *ElasticsearchClient) GetQuestionById(queryId string) *response.Question {
-	resp, err := es.Client.Get("question", queryId).Do(context.Background())
-	if err != nil {
-		return nil
-	}
-	var res response.Question
-	err = json.Unmarshal(resp.Source_, &res)
-	if err != nil {
-		return nil
-	}
-	return &res
+func (es *ESClient) GetQuestionById(queryId int) *response.Question {
+	return getDocById[response.Question](es, constant.QUESTION_INDEX, queryId)
 }
 
-func (es *ElasticsearchClient) SearchQuestions(query string) []*response.Question {
-	request := &types.Query{
-		MatchAll: &types.MatchAllQuery{
-			QueryName_: &query,
-		},
-	}
-	res, err := es.Client.Search().Index("question").Query(request).Do(context.Background())
-	if err != nil {
-		return nil
-	}
-
-	var questions []*response.Question
-	for _, hit := range res.Hits.Hits {
-		var question response.Question
-		if err = json.Unmarshal(hit.Source_, &question); err != nil {
-			log.Printf("Error unmarshalling hit: %s", err)
-			continue
-		}
-		questions = append(questions, &question)
-	}
-	return questions
+func (es *ESClient) SearchQuestions(query string) []*response.Question {
+	return searchDocsByQuery[response.Question](es, constant.QUESTION_INDEX, query)
 }
-func (es *ElasticsearchClient) DeleteQuestionById(id string) error {
-	_, err := es.Client.Delete("question", id).Do(context.Background())
-	if err != nil {
-		return err
+
+func (es *ESClient) DeleteQuestionById(queryId int) error {
+	return deleteById(es, constant.QUESTION_INDEX, queryId)
+}
+
+func (es *ESClient) UpdateQuestion(question *response.Question) error {
+	return updateDocsById[response.Question](es, constant.QUESTION_INDEX, question.ID, question)
+}
+
+func (es *ESClient) UpdateQuestionAcceptNum(questionId int) error {
+	question := es.GetQuestionById(questionId)
+	acceptNum := question.AcceptNum + 1
+	data := &response.Question{
+		AcceptNum: acceptNum,
 	}
-	return nil
+	return updateDocsById[response.Question](es, constant.QUESTION_INDEX, questionId, data)
+}
+
+func (es *ESClient) UpdateQuestionSubmitNum(questionId int) error {
+	question := es.GetQuestionById(questionId)
+	submitNum := question.SubmitNum + 1
+	data := &response.Question{
+		AcceptNum: submitNum,
+	}
+	question.SubmitNum++
+	return updateDocsById[response.Question](es, constant.QUESTION_INDEX, questionId, data)
 }
