@@ -1,6 +1,8 @@
 package docker
 
 import (
+	"context"
+	"fmt"
 	"github.com/docker/docker/client"
 )
 
@@ -13,6 +15,11 @@ func NewDockerClient() *DockerClient {
 	if err != nil {
 		panic(err)
 	}
+	res, err := cli.Ping(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(res.APIVersion)
 	return &DockerClient{
 		client: cli,
 	}

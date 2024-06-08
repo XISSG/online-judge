@@ -20,7 +20,7 @@ func (mysql *MysqlClient) GetUserById(userId int) *entity.User {
 
 func (mysql *MysqlClient) GetUserByName(name string) *entity.User {
 	var user *entity.User
-	tx := mysql.Model("user").Where("user_name = ?", name).First(&user)
+	tx := mysql.client.Model("user").Where("user_name = ?", name).First(&user)
 	if tx.Error != nil {
 		return nil
 	}
@@ -29,7 +29,7 @@ func (mysql *MysqlClient) GetUserByName(name string) *entity.User {
 
 func (mysql *MysqlClient) GetUserListByName(userName string) []*entity.User {
 	var users []*entity.User
-	tx := mysql.Model("user").Where("user_name like ?", "%"+userName+"%").Find(&users)
+	tx := mysql.client.Model("user").Where("user_name like ?", "%"+userName+"%").Find(&users)
 	if tx.Error != nil {
 		return nil
 	}
@@ -37,12 +37,12 @@ func (mysql *MysqlClient) GetUserListByName(userName string) []*entity.User {
 	return users
 }
 
-func (mysql *MysqlClient) UpdateUser(userId int, data *entity.User) error {
-	return updateDataById[entity.User](mysql, constant.USER_TABLE, userId, data)
+func (mysql *MysqlClient) UpdateUser(user *entity.User) error {
+	return updateDataById[entity.User](mysql, constant.USER_TABLE, user.ID, user)
 }
 
 func (mysql *MysqlClient) BanUser(userId int) error {
-	tx := mysql.Begin()
+	tx := mysql.client.Begin()
 	tx.Model("user").Where("id = ?", userId).Update("user_role", constant.BAN)
 	if tx.Error != nil {
 		tx.Rollback()

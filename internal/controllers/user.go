@@ -45,7 +45,7 @@ func (r *UserHandler) register(ctx *gin.Context) {
 func (r *UserHandler) login(ctx *gin.Context) {
 	loginRequest := request.Login{}
 	ctx.ShouldBindJSON(&loginRequest)
-	ok := r.userService.CheckUser(loginRequest.UserName, loginRequest.UserPassword)
+	ok := r.userService.CheckUserLegal(loginRequest.UserName, loginRequest.UserPassword)
 	if !ok {
 		ctx.JSON(400, "Login failed")
 		return
@@ -94,7 +94,8 @@ func (r *UserHandler) updateUser(ctx *gin.Context) {
 }
 
 func (r *UserHandler) deleteUser(ctx *gin.Context) {
-	id := ctx.Query("id")
+	idStr := ctx.Query("id")
+	id, _ := strconv.Atoi(idStr)
 	r.userService.DeleteUserById(id)
 	ctx.JSON(200, "success")
 }

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/xissg/online-judge/internal/model/entity"
 	"github.com/xissg/online-judge/internal/model/request"
 	"github.com/xissg/online-judge/internal/model/response"
 	"github.com/xissg/online-judge/internal/repository/mysql"
@@ -11,12 +12,12 @@ type UserService interface {
 	CreateUser(userRequest *request.User) error
 	GetUserById(userId int) *response.User
 	GetUserByUsername(username string) *response.User
-	GetUserListByUsername(username int) []*response.User
+	GetUserListByUsername(username string) []*response.User
 	UpdateUserPassword(userId int, password string) error
 	UpdateUserAvatar(userId int, avatar string) error
-	DeleteUserById(userId string) error
-	BanUserById(userId string) error
-	CheckUser(userName, password string) bool
+	DeleteUserById(userId int) error
+	BanUserById(userId int) error
+	CheckUserLegal(userName, password string) bool
 }
 
 type userService struct {
@@ -71,7 +72,11 @@ func (s *userService) GetUserListByUsername(username string) []*response.User {
 
 func (s *userService) UpdateUserPassword(userId int, password string) error {
 	password = utils.MD5Crypt(password)
-	err := s.mysql.UpdateUserPassword(userId, password)
+	user := &entity.User{
+		ID:           userId,
+		UserPassword: password,
+	}
+	err := s.mysql.UpdateUser(user)
 	if err != nil {
 		return err
 	}
@@ -79,7 +84,11 @@ func (s *userService) UpdateUserPassword(userId int, password string) error {
 }
 
 func (s *userService) UpdateUserAvatar(userId int, avatar string) error {
-	err := s.mysql.UpdateUserAvatar(userId, avatar)
+	user := &entity.User{
+		ID:        userId,
+		AvatarURL: avatar,
+	}
+	err := s.mysql.UpdateUser(user)
 	if err != nil {
 		return err
 	}
@@ -102,7 +111,7 @@ func (s *userService) BanUserById(userId int) error {
 	return nil
 }
 
-func (s *userService) CheckUser(userName, password string) bool {
+func (s *userService) CheckUserLegal(userName, password string) bool {
 	user := s.mysql.GetUserByName(userName)
 	if user == nil {
 		return false

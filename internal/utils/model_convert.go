@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"github.com/xissg/online-judge/internal/constant"
+	"github.com/xissg/online-judge/internal/model/common"
 	"github.com/xissg/online-judge/internal/model/entity"
 	"github.com/xissg/online-judge/internal/model/request"
 	"github.com/xissg/online-judge/internal/model/response"
@@ -68,7 +69,7 @@ func ConvertQuestionResponse(questionEntity *entity.Question) *response.Question
 	var tag []string
 	var answer []string
 	var judgeCase []string
-	var judgeConfig []response.Config
+	var judgeConfig []common.Config
 	var questionResponse *response.Question
 
 	err := json.Unmarshal([]byte(questionEntity.Tag), &tag)
@@ -129,7 +130,7 @@ func UpdateQuestionToQuestionEntity(updateRequest *request.UpdateQuestion) *enti
 func ConvertSubmitEntity(submitRequest *request.Submit, userId int) *entity.Submit {
 	var submitEntity *entity.Submit
 
-	submitEntity.Status = ""
+	submitEntity.Status = constant.WATING_STATUS
 	submitEntity.UserId = userId
 	submitEntity.ID = Snowflake()
 	submitEntity.JudgeResult = ""

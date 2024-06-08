@@ -1,6 +1,8 @@
 package response
 
-import "time"
+import (
+	"github.com/xissg/online-judge/internal/model/common"
+)
 
 type Question struct {
 	ID int `json:"id"`
@@ -19,7 +21,7 @@ type Question struct {
 	// "判题用例json数组"
 	JudgeCase []string `json:"judge_case,omitempty"`
 	// "判题配置json对象"
-	JudgeConfig []Config `json:"judge_config,omitempty" `
+	JudgeConfig []common.Config `json:"judge_config,omitempty" `
 	// "创建用户id"
 	UserId int `json:"user_id,omitempty"`
 	// "创建时间"
@@ -28,7 +30,4 @@ type Question struct {
 	UpdateTime string `json:"update_time,omitempty"`
 }
 
-type Config struct {
-	TimeLimit   time.Duration `json:"time_limit,omitempty"`
-	MemoryLimit int           `json:"memory_limit,omitempty"`
-}
+

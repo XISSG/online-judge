@@ -31,7 +31,7 @@ func (mysql *MysqlClient) UpdateQuestion(question *entity.Question) error {
 }
 
 func (mysql *MysqlClient) DeleteQuestion(questionId int) error {
-	err := deleteDataById[entity.Question](mysql, constant.QUESTION_TABLE, questionId)
+	err := deleteDataById(mysql, constant.QUESTION_TABLE, questionId)
 	if err != nil {
 		return err
 	}
