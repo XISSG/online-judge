@@ -3,7 +3,7 @@ package response
 type Submit struct {
 	ID int `json:"id"`
 	//"判题信息json对象(包含上面的枚举值)
-	JudgeResult []string `json:"judge_info,omitempty"`
+	JudgeResult string `json:"judge_info,omitempty"`
 	//"判题状态（待判题,判题中,成功,失败)",
 	Status string `json:"status,omitempty"`
 	//"判题id"

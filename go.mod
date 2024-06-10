@@ -11,6 +11,7 @@ require (
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/gocolly/colly/v2 v2.1.0
+	github.com/gorilla/websocket v1.5.2
 	github.com/opencontainers/image-spec v1.1.0
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/robfig/cron/v3 v3.0.1

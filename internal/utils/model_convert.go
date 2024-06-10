@@ -69,7 +69,7 @@ func ConvertQuestionResponse(questionEntity *entity.Question) *response.Question
 	var tag []string
 	var answer []string
 	var judgeCase []string
-	var judgeConfig []common.Config
+	var judgeConfig common.Config
 	var questionResponse *response.Question
 
 	err := json.Unmarshal([]byte(questionEntity.Tag), &tag)
@@ -123,6 +123,7 @@ func UpdateQuestionToQuestionEntity(updateRequest *request.UpdateQuestion) *enti
 	questionEntity.ID = updateRequest.ID
 	questionEntity.Title = updateRequest.Title
 	questionEntity.Content = updateRequest.Content
+	questionEntity.UpdateTime = time.Now().Format(time.RFC3339Nano)
 
 	return questionEntity
 }
@@ -145,20 +146,24 @@ func ConvertSubmitEntity(submitRequest *request.Submit, userId int) *entity.Subm
 }
 func ConvertSubmitResponse(submitEntity *entity.Submit) *response.Submit {
 	var submitResponse *response.Submit
-	var judgeResult []string
-	if submitEntity.JudgeResult != "" {
-		err := json.Unmarshal([]byte(submitEntity.JudgeResult), &judgeResult)
-		if err != nil {
-			return nil
-		}
-	}
+
 	submitResponse.ID = submitEntity.ID
 	submitResponse.UserId = submitEntity.UserId
 	submitResponse.QuestionId = submitEntity.QuestionId
 	submitResponse.Status = submitEntity.Status
-	submitResponse.JudgeResult = judgeResult
+	submitResponse.JudgeResult = submitEntity.JudgeResult
 	submitResponse.CreateTime = submitEntity.CreateTime
 	submitResponse.UpdateTime = submitEntity.UpdateTime
 
 	return submitResponse
+}
+
+func UpdateSubmitToSubmitEntity(updateRequest *request.UpdateSubmit) *entity.Submit {
+	var submitEntity *entity.Submit
+
+	submitEntity.ID = updateRequest.ID
+	submitEntity.Status = updateRequest.Status
+	submitEntity.JudgeResult = updateRequest.JudgeResult
+	submitEntity.UpdateTime = time.Now().Format(time.RFC3339Nano)
+	return submitEntity
 }

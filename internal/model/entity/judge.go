@@ -7,32 +7,33 @@ import (
 type Context struct {
 	Question *QuestionContext
 	Config   *ConfigContext
-	Result   []*ResultContext
+	Result   *ResultContext
 }
 type QuestionContext struct {
 	SubmitId    int
 	QuestionId  int
 	Language    string
+	Title       string
 	Code        string
 	Answer      []string
 	Status      string
-	JudgeResult []string
+	JudgeResult string
 	JudgeCase   []string
-	JudgeConfig []common.Config
+	JudgeConfig common.Config
 }
 type ConfigContext struct {
-	SourceFileName  string
-	SourceFileDir   string
-	ShellFileName   string
-	CompileDir      string
-	CompileFileName string
-	Image           string
-	ContainerId     []string
+	SourceFileName string
+	SourceFileDir  string
+	ShellFileName  string
+	CompileDir     string
+	ExecFileName   string
+	Image          string
+	ContainerId    string
 }
 
 type ResultContext struct {
 	ExitCode    int
 	ExecTime    int64
 	MemoryUsage uint64
-	Output      string
+	Output      []string
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/xissg/online-judge/internal/model/response"
 	"github.com/xissg/online-judge/internal/repository/mysql"
 	"github.com/xissg/online-judge/internal/utils"
+	"time"
 )
 
 type UserService interface {
@@ -75,6 +76,7 @@ func (s *userService) UpdateUserPassword(userId int, password string) error {
 	user := &entity.User{
 		ID:           userId,
 		UserPassword: password,
+		UpdateTime:   time.Now().Format(time.RFC3339Nano),
 	}
 	err := s.mysql.UpdateUser(user)
 	if err != nil {
@@ -85,8 +87,9 @@ func (s *userService) UpdateUserPassword(userId int, password string) error {
 
 func (s *userService) UpdateUserAvatar(userId int, avatar string) error {
 	user := &entity.User{
-		ID:        userId,
-		AvatarURL: avatar,
+		ID:         userId,
+		AvatarURL:  avatar,
+		UpdateTime: time.Now().Format(time.RFC3339Nano),
 	}
 	err := s.mysql.UpdateUser(user)
 	if err != nil {

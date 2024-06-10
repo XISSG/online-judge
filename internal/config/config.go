@@ -12,6 +12,8 @@ type Config struct {
 	Redis         RedisConfig
 	RabbitMQ      RabbitMQConfig
 	Server        ServerConfig
+	Image         ImageConfig
+	AI            AIConfig
 }
 
 type ElasticsearchConfig struct {
@@ -50,9 +52,23 @@ type ServerConfig struct {
 	Port int    `mapstructure:"port"`
 }
 
+type AIConfig struct {
+	HostUrl   string `mapstructure:"host_url"`
+	AppId     string `mapstructure:"app_id"`
+	ApiSecret string `mapstructure:"api_secret"`
+	ApiKey    string `mapstructure:"api_key"`
+}
+
+type ImageConfig map[string]string
+
 func LoadConfig() Config {
+	//main执行的路径
 	//viper.AddConfigPath("internal/config/")
-	viper.AddConfigPath("../../config/")
+	//service层执行的路径
+	viper.AddConfigPath("../config/")
+	//repository层执行的路径
+	//viper.AddConfigPath("../../config/")
+	//viper.AddConfigPath("./")
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 

@@ -9,12 +9,11 @@ import (
 	"github.com/docker/docker/pkg/archive"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 	"io"
-	"strconv"
 	"time"
 )
 
 // 配置执行命令
-func (docker *DockerClient) ContainerCreate(imageName string, containerName string, cmds []string, timeOut time.Duration) string {
+func (docker *DockerClient) ContainerCreate(imageName string, containerName string, workingDir string, cmds []string, timeOut time.Duration) string {
 	ctx := context.Background()
 	stopTimeout := new(int)
 	*stopTimeout = int(timeOut)
@@ -23,6 +22,7 @@ func (docker *DockerClient) ContainerCreate(imageName string, containerName stri
 		AttachStdout: true,
 		AttachStderr: true,
 		Image:        imageName,
+		WorkingDir:   workingDir,
 		Cmd:          cmds,
 		StopTimeout:  stopTimeout,
 	}
@@ -47,6 +47,10 @@ func (docker *DockerClient) CopyToContainer(containerId string, dstDir string, s
 	return docker.client.CopyToContainer(ctx, containerId, dstDir, content, options)
 }
 
+func (docker *DockerClient) ContainerWait(containerId string) (chanResponse <-chan container.WaitResponse, chanErr <-chan error) {
+	ctx := context.Background()
+	return docker.client.ContainerWait(ctx, containerId, container.WaitConditionNotRunning)
+}
 func (docker *DockerClient) ContainerStart(containerId string) error {
 	ctx := context.Background()
 	options := container.StartOptions{}
@@ -63,23 +67,35 @@ func (docker *DockerClient) ContainerInspect(containerId string) (int, int64) {
 
 	exitCode := res.State.ExitCode
 	start := res.State.StartedAt
-	startTime, _ := strconv.ParseInt(start, 10, 64)
+	startTime, err := time.Parse(time.RFC3339, start)
 	finish := res.State.FinishedAt
-	finishTime, _ := strconv.ParseInt(finish, 10, 64)
-	execTime := finishTime - startTime
+	endTime, err := time.Parse(time.RFC3339, finish)
+	execTime := endTime.Sub(startTime).Milliseconds()
 	return exitCode, execTime
 }
 
 // 获取执行结果
 func (docker *DockerClient) ContainerLogs(containerId string) (string, error) {
 	ctx := context.Background()
-	options := container.LogsOptions{}
+	options := container.LogsOptions{
+		ShowStdout: true,
+		ShowStderr: true,
+	}
 	resp, err := docker.client.ContainerLogs(ctx, containerId, options)
 	if err != nil {
 		return "", err
 	}
 	defer resp.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	// 读取容器日志
 	logs, err := io.ReadAll(resp)
+	if err != nil {
+		return "", err
+	}
+
 	return string(logs), err
 }
 
@@ -92,7 +108,7 @@ func (docker *DockerClient) ContainerStats(containerId string) (uint64, error) {
 	}
 	var data types.StatsJSON
 	err = json.NewDecoder(res.Body).Decode(&data)
-	return data.MemoryStats.MaxUsage, err
+	return data.MemoryStats.Usage, err
 }
 
 func (docker *DockerClient) ContainerStop(containerId string) error {

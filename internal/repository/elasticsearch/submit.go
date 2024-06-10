@@ -17,6 +17,10 @@ func (es *ESClient) SearchSubmits(query string) []*response.Submit {
 	return searchDocsByQuery[response.Submit](es, constant.SUBMIT_INDEX, query)
 }
 
+func (es *ESClient) UpdateSubmit(submit *response.Submit) error {
+	return updateDocsById[response.Submit](es, constant.SUBMIT_INDEX, submit.ID, submit)
+}
+
 func (es *ESClient) DeleteSubmitById(queryId int) error {
 	return deleteById(es, constant.SUBMIT_INDEX, queryId)
 }

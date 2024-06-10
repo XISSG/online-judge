@@ -1,7 +1,6 @@
 package mysql
 
 import (
-	"errors"
 	"github.com/xissg/online-judge/internal/constant"
 	"github.com/xissg/online-judge/internal/model/entity"
 )
@@ -36,22 +35,4 @@ func (mysql *MysqlClient) DeleteQuestion(questionId int) error {
 		return err
 	}
 	return nil
-}
-
-func (mysql *MysqlClient) UpdateQuestionAcceptNum(questionId int) error {
-	data := getDataById[entity.Question](mysql, constant.QUESTION_TABLE, questionId)
-	if data == nil {
-		return errors.New("no data for question")
-	}
-	data.AcceptNum++
-	return updateDataById[entity.Question](mysql, constant.QUESTION_TABLE, questionId, data)
-}
-
-func (mysql *MysqlClient) UpdateQuestionSubmitNum(questionId int) error {
-	data := getDataById[entity.Question](mysql, constant.QUESTION_TABLE, questionId)
-	if data == nil {
-		return errors.New("no data for question")
-	}
-	data.SubmitNum++
-	return updateDataById[entity.Question](mysql, constant.QUESTION_TABLE, questionId, data)
 }

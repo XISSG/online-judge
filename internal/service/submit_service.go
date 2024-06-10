@@ -15,7 +15,9 @@ type SubmitService interface {
 	CreateSubmit(submit *request.Submit, userId int) error
 	SearchSubmit(query string) ([]*response.Submit, error)
 	GetSubmitList(page, pageSize int) ([]*response.Submit, error)
+	UpdateSubmit(submit *request.UpdateSubmit) error
 	DeleteSubmit(id int) error
+	GetSubmitById(id int) (*entity.Submit, error)
 }
 
 type submitService struct {
@@ -69,9 +71,32 @@ func (q *submitService) GetSubmitList(page, pageSize int) ([]*response.Submit, e
 	return result, nil
 }
 
+func (q *submitService) UpdateSubmit(submit *request.UpdateSubmit) error {
+	submitEntity := utils.UpdateSubmitToSubmitEntity(submit)
+	err := q.mysql.UpdateSubmit(submitEntity)
+	if err != nil {
+		return nil
+	}
+	submitResponse := utils.ConvertSubmitResponse(submitEntity)
+	err = q.es.UpdateSubmit(submitResponse)
+	err = q.redis.DeleteSubmitById(submit.ID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (q *submitService) DeleteSubmit(id int) error {
 	err := q.mysql.DeleteSubmit(id)
 	err = q.es.DeleteSubmitById(id)
 	err = q.redis.DeleteSubmitById(id)
 	return err
+}
+
+func (q *submitService) GetSubmitById(id int) (*entity.Submit, error) {
+	res := q.mysql.GetSubmitById(id)
+	if res == nil {
+		return nil, errors.New("not found query submit")
+	}
+	return res, nil
 }

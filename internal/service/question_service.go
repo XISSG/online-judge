@@ -17,6 +17,9 @@ type QuestionService interface {
 	GetQuestionList(page, pageSize int) ([]*response.Question, error)
 	UpdateQuestion(question *request.UpdateQuestion) error
 	DeleteQuestion(id int) error
+	UpdateQuestionAcceptNum(id int) error
+	UpdateQuestionSubmitNum(id int) error
+	GetQuestionById(id int) (*entity.Question, error)
 }
 
 type questionService struct {
@@ -90,4 +93,30 @@ func (q *questionService) DeleteQuestion(id int) error {
 	err = q.es.DeleteQuestionById(id)
 	err = q.redis.DeleteQuestionById(id)
 	return err
+}
+func (q *questionService) UpdateQuestionAcceptNum(id int) error {
+	questionEntity := q.mysql.GetQuestionById(id)
+	updateRequest := &request.UpdateQuestion{
+		ID:        id,
+		AcceptNum: questionEntity.AcceptNum + 1,
+		SubmitNum: questionEntity.SubmitNum + 1,
+	}
+	return q.UpdateQuestion(updateRequest)
+}
+
+func (q *questionService) UpdateQuestionSubmitNum(id int) error {
+	questionEntity := q.mysql.GetQuestionById(id)
+	updateRequest := &request.UpdateQuestion{
+		ID:        id,
+		SubmitNum: questionEntity.SubmitNum + 1,
+	}
+	return q.UpdateQuestion(updateRequest)
+}
+
+func (q *questionService) GetQuestionById(id int) (*entity.Question, error) {
+	questionEntity := q.mysql.GetQuestionById(id)
+	if questionEntity == nil {
+		return nil, errors.New("not found question")
+	}
+	return questionEntity, nil
 }

@@ -24,3 +24,16 @@ RabbitMQ:
 Server:
   host: 127.0.0.1
   port: 8082
+Image:
+  javascript: "javascript:latest"
+  python: "python:latest"
+  java: "java:latest"
+  go: "golang:latest"
+  cpp: "cpp:latest"
+  c: "c:latest"
+AI:
+  #hostUrl: "wss://spark-api.xf-yun.com/v1.1/chat"
+  host_url: "wss://spark-api.xf-yun.com/v3.5/chat"
+  app_id: "3fd9659c"
+  api_secret: "NDM4MjZjY2VkYzE0MzE5NWJlMGEyOTc1"
+  api_key: "030ebc99d5951548bf7991edd9d83a2c"

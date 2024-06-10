@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS `submit`
     `status`      varchar(256)      not null comment "判题状态（待判题,判题中,成功,失败)",
     `question_id` bigint            not null comment "判题id",
     `user_id`     bigint            not null comment "创建用户id",
-    `create_time` varchar(256)      NOT NULL COMMENT "创建时间",
-    `update_time` varchar(256)      NOT NULL NULL COMMENT "更新时间",
+    `create_time` varchar(256)     NOT NULL COMMENT "创建时间",
+    `update_time` varchar(256)     NOT NULL NULL COMMENT "更新时间",
     `is_delete`   tinyint default 0 not null comment "是否删除",
     index idx_question_id (question_id),
     index idx_user_id (user_id)

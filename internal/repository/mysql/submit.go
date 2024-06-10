@@ -20,6 +20,10 @@ func (mysql *MysqlClient) GetSubmitById(submitId int) *entity.Submit {
 func (mysql *MysqlClient) GetSubmitList(page, pageSize int) (submitList []*entity.Submit) {
 	return getDataList[entity.Submit](mysql, constant.SUBMIT_TABLE, page, pageSize)
 }
+
+func (mysql *MysqlClient) UpdateSubmit(submit *entity.Submit) error {
+	return updateDataById[entity.Submit](mysql, constant.SUBMIT_TABLE, submit.ID, submit)
+}
 func (mysql *MysqlClient) DeleteSubmit(submitId int) error {
 	err := deleteDataById(mysql, constant.SUBMIT_TABLE, submitId)
 	if err != nil {
