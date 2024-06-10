@@ -5,7 +5,7 @@ import (
 	"github.com/xissg/online-judge/internal/model/entity"
 	"github.com/xissg/online-judge/internal/model/request"
 	"github.com/xissg/online-judge/internal/model/response"
-	"github.com/xissg/online-judge/internal/repository/elasticsearch"
+	"github.com/xissg/online-judge/internal/repository/elastic"
 	"github.com/xissg/online-judge/internal/repository/mysql"
 	"github.com/xissg/online-judge/internal/repository/redis"
 	"github.com/xissg/online-judge/internal/utils"
@@ -22,11 +22,11 @@ type SubmitService interface {
 
 type submitService struct {
 	mysql *mysql.MysqlClient
-	es    *elasticsearch.ESClient
+	es    *elastic.ESClient
 	redis *redis.RedisClient
 }
 
-func NewSubmitService(mysql *mysql.MysqlClient, es *elasticsearch.ESClient, redis *redis.RedisClient) SubmitService {
+func NewSubmitService(mysql *mysql.MysqlClient, es *elastic.ESClient, redis *redis.RedisClient) SubmitService {
 	return &submitService{
 		mysql: mysql,
 		es:    es,

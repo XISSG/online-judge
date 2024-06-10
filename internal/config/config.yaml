@@ -17,23 +17,30 @@ Redis:
   password: ""
   db: 0
 RabbitMQ:
-  username: guest
-  password: guest
-  host: 127.0.0.1
+  username: "xissg"
+  password: "0709"
+  host: "localhost"
   port: 5672
+  exchange_name: "judge_exchange"
+  exchange_type: "direct"
+  routing_key: "judge"
+  queue_name: "judge_queue"
+  consumer_tag: "judge_consumer"
 Server:
   host: 127.0.0.1
   port: 8082
 Image:
-  javascript: "javascript:latest"
-  python: "python:latest"
-  java: "java:latest"
+  javascript: "node:22-alpine"
+  python: "python:3.12-alpine"
+  java: "java:6"
   go: "golang:latest"
-  cpp: "cpp:latest"
-  c: "c:latest"
+  cpp: "eclipse/cpp_gcc:latest"
+  c: "gcc:13.3.0"
 AI:
-  #hostUrl: "wss://spark-api.xf-yun.com/v1.1/chat"
+  #host_url: "wss://spark-api.xf-yun.com/v1.1/chat"
   host_url: "wss://spark-api.xf-yun.com/v3.5/chat"
   app_id: "3fd9659c"
   api_secret: "NDM4MjZjY2VkYzE0MzE5NWJlMGEyOTc1"
   api_key: "030ebc99d5951548bf7991edd9d83a2c"
+  flexibility: 4
+  randomness: 0.8

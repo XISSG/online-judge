@@ -5,7 +5,7 @@ import (
 	"github.com/xissg/online-judge/internal/model/entity"
 	"github.com/xissg/online-judge/internal/model/request"
 	"github.com/xissg/online-judge/internal/model/response"
-	"github.com/xissg/online-judge/internal/repository/elasticsearch"
+	"github.com/xissg/online-judge/internal/repository/elastic"
 	"github.com/xissg/online-judge/internal/repository/mysql"
 	"github.com/xissg/online-judge/internal/repository/redis"
 	"github.com/xissg/online-judge/internal/utils"
@@ -24,11 +24,11 @@ type QuestionService interface {
 
 type questionService struct {
 	mysql *mysql.MysqlClient
-	es    *elasticsearch.ESClient
+	es    *elastic.ESClient
 	redis *redis.RedisClient
 }
 
-func NewQuestionService(mysql *mysql.MysqlClient, es *elasticsearch.ESClient, redis *redis.RedisClient) QuestionService {
+func NewQuestionService(mysql *mysql.MysqlClient, es *elastic.ESClient, redis *redis.RedisClient) QuestionService {
 	return &questionService{
 		mysql: mysql,
 		es:    es,

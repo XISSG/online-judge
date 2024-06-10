@@ -41,10 +41,15 @@ type RedisConfig struct {
 }
 
 type RabbitMQConfig struct {
-	Username string `mapstructure:"username"`
-	Password string `mapstructure:"password"`
-	Host     string `mapstructure:"host"`
-	Port     int    `mapstructure:"port"`
+	Username     string `mapstructure:"username"`
+	Password     string `mapstructure:"password"`
+	Host         string `mapstructure:"host"`
+	Port         int    `mapstructure:"port"`
+	ExchangeName string `mapstructure:"exchange_name"`
+	ExchangeType string `mapstructure:"exchange_type"`
+	RoutingKey   string `mapstructure:"routing_key"`
+	QueueName    string `mapstructure:"queue_name"`
+	ConsumerTag  string `mapstructure:"consumer_tag"`
 }
 
 type ServerConfig struct {
@@ -53,10 +58,12 @@ type ServerConfig struct {
 }
 
 type AIConfig struct {
-	HostUrl   string `mapstructure:"host_url"`
-	AppId     string `mapstructure:"app_id"`
-	ApiSecret string `mapstructure:"api_secret"`
-	ApiKey    string `mapstructure:"api_key"`
+	HostUrl     string  `mapstructure:"host_url"`
+	AppId       string  `mapstructure:"app_id"`
+	ApiSecret   string  `mapstructure:"api_secret"`
+	ApiKey      string  `mapstructure:"api_key"`
+	Flexibility int     `mapstructure:"flexibility"`
+	Randomness  float64 `mapstructure:"randomness"`
 }
 
 type ImageConfig map[string]string
@@ -65,9 +72,9 @@ func LoadConfig() Config {
 	//main执行的路径
 	//viper.AddConfigPath("internal/config/")
 	//service层执行的路径
-	viper.AddConfigPath("../config/")
+	//viper.AddConfigPath("../config/")
 	//repository层执行的路径
-	//viper.AddConfigPath("../../config/")
+	viper.AddConfigPath("../../config/")
 	//viper.AddConfigPath("./")
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")

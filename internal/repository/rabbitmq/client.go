@@ -7,16 +7,34 @@ import (
 )
 
 type RabbitMQClient struct {
-	client *amqp.Connection
+	conn    *amqp.Connection
+	channel *amqp.Channel
+	ctx     *context
+}
+type context struct {
+	exchangeName string
+	exchangeType string
+	routingKey   string
+	queueName    string
+	consumerTag  string
 }
 
 func NewRabbitMQClient(cfg config.RabbitMQConfig) *RabbitMQClient {
-	dsn := fmt.Sprintf("amqp://%s:%s@%s:%v/", cfg.Username, cfg.Password, cfg.Host, cfg.Port)
-	conn, err := amqp.Dial(dsn)
+	mqurl := fmt.Sprintf("amqp://%s:%s@%s:%v/", cfg.Username, cfg.Password, cfg.Host, cfg.Port)
+	conn, err := amqp.Dial(mqurl)
+	ch, err := conn.Channel()
 	if err != nil {
 		panic(err)
 	}
 	return &RabbitMQClient{
-		client: conn,
+		conn:    conn,
+		channel: ch,
+		ctx: &context{
+			exchangeName: cfg.ExchangeName,
+			exchangeType: cfg.ExchangeType,
+			routingKey:   cfg.RoutingKey,
+			queueName:    cfg.QueueName,
+			consumerTag:  cfg.ConsumerTag,
+		},
 	}
 }

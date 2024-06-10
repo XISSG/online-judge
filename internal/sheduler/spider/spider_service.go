@@ -7,17 +7,21 @@ import (
 	"net/url"
 )
 
-type BingSpider struct {
+type Spider interface {
+	CrawlPictures(keyword string) []string
+	CrawlArticles(keyword string) []string
+}
+type spider struct {
 	collector *colly.Collector
 }
 
 func NewBingSpider(options ...colly.CollectorOption) Spider {
-	return &BingSpider{
+	return &spider{
 		collector: colly.NewCollector(options...),
 	}
 }
 
-func (spider *BingSpider) CrawlImages(keyword string) []string {
+func (spider *spider) CrawlPictures(keyword string) []string {
 	var images []string
 	spider.collector.OnHTML("div.img_cont.hoff", func(e *colly.HTMLElement) {
 		e.DOM.Find("img").Each(func(_ int, s *goquery.Selection) {
@@ -35,7 +39,7 @@ func (spider *BingSpider) CrawlImages(keyword string) []string {
 	return images
 }
 
-func (spider *BingSpider) CrawlArticles(keyword string) []string {
+func (spider *spider) CrawlArticles(keyword string) []string {
 
 	return nil
 }

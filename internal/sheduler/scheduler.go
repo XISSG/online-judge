@@ -7,14 +7,14 @@ import (
 )
 
 type Scheduler struct {
-	cron        *cron.Cron
-	userService service.UserService
+	cron  *cron.Cron
+	judge service.JudgeService
+	mq    service.RabbiMqService
 }
 
-func NewScheduler(userService service.UserService) *Scheduler {
+func NewScheduler() *Scheduler {
 	return &Scheduler{
-		cron:        cron.New(),
-		userService: userService,
+		cron: cron.New(),
 	}
 }
 
@@ -37,8 +37,4 @@ func (s *Scheduler) Stop() {
 // 定时任务的业务逻辑
 func (s *Scheduler) userCleanupTask() {
 	log.Println("Running user cleanup task")
-	err := s.userService.CleanupInactiveUsers()
-	if err != nil {
-		log.Printf("Error running user cleanup task: %v", err)
-	}
 }

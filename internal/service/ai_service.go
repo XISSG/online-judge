@@ -1,12 +1,16 @@
 package service
 
 import (
+	"github.com/xissg/online-judge/internal/config"
 	"github.com/xissg/online-judge/internal/constant"
 	"github.com/xissg/online-judge/internal/model/request"
 	"github.com/xissg/online-judge/internal/repository/ai"
 )
 
 type AIService interface {
+	SendMessage(message string) error
+	SendMessagesWithHistory(messages []string) error
+	ReceiveMessage() (string, error)
 }
 
 type aiService struct {
@@ -16,14 +20,15 @@ type aiService struct {
 }
 
 // flexibility 1-6, randomness 0-1
-func NewAIService(client *ai.AIClient, appId string, roleStr string, flexibility int, randomness float64) *aiService {
-	req := client.RoleSetting(flexibility, randomness, appId, roleStr)
+func NewAIService(client *ai.AIClient, aiSetting config.AIConfig) AIService {
+	req := client.AISetting(aiSetting.AppId, aiSetting.Flexibility, aiSetting.Randomness)
 	return &aiService{
 		client:  client,
 		req:     req,
 		history: make([]*request.Text, 0),
 	}
 }
+
 func (s *aiService) SendMessage(message string) error {
 	sendMsg := &request.Text{
 		Role:    constant.USER_ROLE,
@@ -34,13 +39,15 @@ func (s *aiService) SendMessage(message string) error {
 	return s.client.SendMessage(s.req)
 }
 
-func (s *aiService) SendMessageWithHistory(message string) error {
-	sendMsg := &request.Text{
-		Role:    constant.USER_ROLE,
-		Content: message,
-	}
+func (s *aiService) SendMessagesWithHistory(messages []string) error {
 	s.req.Payload.Message.Text = s.history
-	s.req.Payload.Message.Text = append(s.req.Payload.Message.Text, sendMsg)
+	for _, msg := range messages {
+		sendMsg := &request.Text{
+			Role:    constant.USER_ROLE,
+			Content: msg,
+		}
+		s.req.Payload.Message.Text = append(s.req.Payload.Message.Text, sendMsg)
+	}
 	s.history = append(s.history, s.req.Payload.Message.Text...)
 	return s.client.SendMessage(s.req)
 }
@@ -51,6 +58,9 @@ func (s *aiService) ReceiveMessage() (string, error) {
 	}
 	var res string
 	for i := range messages {
+		if messages[i].Payload == nil {
+			continue
+		}
 		res += messages[i].Payload.Choices.Text[0].Content
 	}
 

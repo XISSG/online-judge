@@ -1,9 +1,13 @@
 package docker
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestImagePull(t *testing.T) {
 	client := NewDockerClient()
 	//client.ImagePull("nginx:latest")
-	client.ImageList()
+	images := client.ImageList()
+	fmt.Println(images)
 }

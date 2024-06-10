@@ -1,4 +1,4 @@
-package elasticsearch
+package elastic
 
 import (
 	elasticsearch "github.com/elastic/go-elasticsearch/v8"

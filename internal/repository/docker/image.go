@@ -9,7 +9,7 @@ import (
 	"log"
 )
 
-func (docker *DockerClient) ImageList() {
+func (docker *DockerClient) ImageList() []string {
 	ctx := context.Background()
 	options := image.ListOptions{
 		All: true,
@@ -19,9 +19,11 @@ func (docker *DockerClient) ImageList() {
 		log.Printf("Error getting")
 	}
 
+	var result []string
 	for _, img := range res {
-		fmt.Println(img.RepoTags)
+		result = append(result, img.RepoTags...)
 	}
+	return result
 }
 func (docker *DockerClient) ImagePull(imageTag string) {
 	resp, err := docker.client.ImagePull(context.Background(), imageTag, image.PullOptions{})

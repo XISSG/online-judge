@@ -4,7 +4,7 @@ import (
 	"github.com/xissg/online-judge/internal/model/common"
 )
 
-type Context struct {
+type JudgeContext struct {
 	Question *QuestionContext
 	Config   *ConfigContext
 	Result   *ResultContext
@@ -21,6 +21,7 @@ type QuestionContext struct {
 	JudgeCase   []string
 	JudgeConfig common.Config
 }
+
 type ConfigContext struct {
 	SourceFileName string
 	SourceFileDir  string

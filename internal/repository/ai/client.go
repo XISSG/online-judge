@@ -3,7 +3,7 @@ package ai
 import (
 	"encoding/json"
 	"github.com/gorilla/websocket"
-	"github.com/xissg/online-judge/internal/constant"
+	"github.com/xissg/online-judge/internal/config"
 	"github.com/xissg/online-judge/internal/model/request"
 	"github.com/xissg/online-judge/internal/model/response"
 	"github.com/xissg/online-judge/internal/utils"
@@ -16,12 +16,11 @@ type AIClient struct {
 
 const NORMAL_RESPONSE_CODE = 101
 
-func NewAIClient(hostUrl string, apiKey string, apiSecret string) *AIClient {
-
+func NewAIClient(cfg config.AIConfig) *AIClient {
 	dialer := websocket.Dialer{
 		HandshakeTimeout: 5 * time.Second,
 	}
-	authStr := utils.AssembleAuthUrl(hostUrl, apiKey, apiSecret)
+	authStr := utils.AssembleAuthUrl(cfg.HostUrl, cfg.ApiKey, cfg.ApiSecret)
 	conn, resp, err := dialer.Dial(authStr, nil)
 	if err != nil {
 		return nil
@@ -35,7 +34,7 @@ func NewAIClient(hostUrl string, apiKey string, apiSecret string) *AIClient {
 }
 
 // topk灵活度，1-6默认为4,temperature随机性0-1, roleSetting设置ai扮演的角色
-func (c *AIClient) RoleSetting(topK int, temperature float64, appId string, roleSetting string) *request.AI {
+func (c *AIClient) AISetting(appId string, topK int, temperature float64) *request.AI {
 	if topK <= 0 || topK > 6 {
 		topK = 4
 	}
@@ -48,20 +47,15 @@ func (c *AIClient) RoleSetting(topK int, temperature float64, appId string, role
 		},
 		Parameter: &request.Parameter{
 			Chat: &request.Chat{
-				Domain:      "general",
+				Domain:      "generalv3.5",
 				Temperature: temperature,
 				TopK:        topK,
-				MaxTokens:   2048,
+				MaxTokens:   4096,
 			},
 		},
 		Payload: &request.Payload{
 			Message: &request.Message{
-				Text: []*request.Text{
-					{
-						Role:    constant.SYSTEM_ROLE,
-						Content: roleSetting,
-					},
-				},
+				Text: []*request.Text{},
 			},
 		},
 	}
@@ -69,7 +63,7 @@ func (c *AIClient) RoleSetting(topK int, temperature float64, appId string, role
 }
 
 func (c *AIClient) SendMessage(aiRequest *request.AI) error {
-	return c.conn.WriteJSON(&aiRequest)
+	return c.conn.WriteJSON(aiRequest)
 }
 
 // staus字段为2时代表数据发送完毕
