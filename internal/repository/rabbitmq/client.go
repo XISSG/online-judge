@@ -4,6 +4,7 @@ import (
 	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/xissg/online-judge/internal/config"
+	"github.com/xissg/online-judge/internal/constant"
 )
 
 type RabbitMQClient struct {
@@ -26,15 +27,32 @@ func NewRabbitMQClient(cfg config.RabbitMQConfig) *RabbitMQClient {
 	if err != nil {
 		panic(err)
 	}
+
+	//根据不同的发布模式进行相应配置
+	ctx := &context{
+		exchangeName: cfg.ExchangeName,
+		routingKey:   cfg.RoutingKey,
+		queueName:    cfg.QueueName,
+		consumerTag:  cfg.ConsumerTag,
+	}
+
+	switch cfg.PublishType {
+	case constant.PUBLISH_PATTERN:
+		ctx.routingKey = ""
+		ctx.exchangeType = constant.FANOUT_TYPE
+	case constant.ROUTING_PATTERN:
+		ctx.queueName = ""
+		ctx.exchangeType = constant.DIRECT_TYPE
+	case constant.TOPIC_PATTERN:
+		ctx.queueName = ""
+		ctx.exchangeType = constant.TOPIC_TYPE
+	default:
+		ctx.routingKey = ""
+		ctx.exchangeType = constant.FANOUT_TYPE
+	}
 	return &RabbitMQClient{
 		conn:    conn,
 		channel: ch,
-		ctx: &context{
-			exchangeName: cfg.ExchangeName,
-			exchangeType: cfg.ExchangeType,
-			routingKey:   cfg.RoutingKey,
-			queueName:    cfg.QueueName,
-			consumerTag:  cfg.ConsumerTag,
-		},
+		ctx:     ctx,
 	}
 }

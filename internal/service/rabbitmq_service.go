@@ -1,20 +1,20 @@
 package service
 
 import (
-	"github.com/rabbitmq/amqp091-go"
 	"github.com/xissg/online-judge/internal/repository/rabbitmq"
 )
 
-type RabbiMqService interface {
+type RabbitMqService interface {
 	Publish(message string) error
-	Consume() (<-chan amqp091.Delivery, error)
+	Consume(handler HandlerFunc)
 }
 
 type rabbitmqService struct {
 	rabbitMqClient *rabbitmq.RabbitMQClient
 }
 
-func NewRabbitMqService(rabbitMqClient *rabbitmq.RabbitMQClient) RabbiMqService {
+func NewRabbitMqService(rabbitMqClient *rabbitmq.RabbitMQClient) RabbitMqService {
+
 	return &rabbitmqService{
 		rabbitMqClient: rabbitMqClient,
 	}
@@ -23,14 +23,24 @@ func NewRabbitMqService(rabbitMqClient *rabbitmq.RabbitMQClient) RabbiMqService 
 func (s *rabbitmqService) Publish(message string) error {
 	err := s.rabbitMqClient.ExchangeDeclare()
 	err = s.rabbitMqClient.Publish(message)
-	err = s.rabbitMqClient.Close()
+	defer s.rabbitMqClient.Close()
 	return err
 }
 
-func (s *rabbitmqService) Consume() (<-chan amqp091.Delivery, error) {
+type HandlerFunc func(string)
+
+func (s *rabbitmqService) Consume(handler HandlerFunc) {
 	err := s.rabbitMqClient.ExchangeDeclare()
 	err = s.rabbitMqClient.QueueDeclareAndBind()
-	res, err := s.rabbitMqClient.Consume()
-	s.rabbitMqClient.Close()
-	return res, err
+	msgs, err := s.rabbitMqClient.Consume()
+	if err != nil {
+		panic(err)
+	}
+	forever := make(chan struct{})
+	go func() {
+		for msg := range msgs {
+			handler(string(msg.Body))
+		}
+	}()
+	<-forever
 }

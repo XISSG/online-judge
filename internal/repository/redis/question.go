@@ -6,11 +6,13 @@ import (
 )
 
 func (redis *RedisClient) CacheQuestionList(questionList []*entity.Question) error {
-	for i := range questionList {
-		err := cacheOrUpdateData[entity.Question](redis, constant.QUESTION_TABLE, questionList[i].ID, questionList[i].ID, questionList[i])
-		if err != nil {
-			return err
-		}
+	var ids []int
+	for _, q := range questionList {
+		ids = append(ids, q.ID)
+	}
+	err := cacheOrUpdateData[entity.Question](redis, constant.QUESTION_TABLE, ids, ids, questionList)
+	if err != nil {
+		return err
 	}
 	return nil
 }

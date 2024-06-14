@@ -2,6 +2,7 @@ package service
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/xissg/online-judge/internal/config"
@@ -15,34 +16,35 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
 
 type JudgeService interface {
-	Start(submitId int)
+	Run(id string)
 }
 
-// TODO:RPC改造
 type judgeService struct {
 	docker   *docker.DockerClient
 	question QuestionService
 	submit   SubmitService
 	ai       AIService
+	service  RabbitMqService
 }
 
-func NewJudgeService(docker *docker.DockerClient, question QuestionService, submit SubmitService, ai AIService) JudgeService {
+func NewJudgeService(docker *docker.DockerClient, question QuestionService, submit SubmitService, ai AIService, service RabbitMqService) JudgeService {
 	return &judgeService{
 		docker:   docker,
 		question: question,
 		submit:   submit,
 		ai:       ai,
+		service:  service,
 	}
 }
 
-func (s *judgeService) Start(submitId int) {
-	//TODO:从rabbitmq中接收提交id，取出来之后将判题状态更新为正在判题
-
+func (s *judgeService) Run(id string) {
+	submitId, _ := strconv.Atoi(id)
 	//判题校验，已判题或正在判题的直接返回
 	submit, _ := s.submit.GetSubmitById(submitId)
 	if submit.Status != constant.WATING_STATUS {
@@ -129,6 +131,7 @@ func (s *judgeService) receiveQuestion(questionId int, ctx *entity.JudgeContext)
 	questionResponse := utils.ConvertQuestionResponse(questionEntity)
 
 	ctx.Question.Title = questionEntity.Title
+	ctx.Question.Content = questionEntity.Content
 	ctx.Question.Answer = questionResponse.Answer
 	ctx.Question.JudgeConfig = questionResponse.JudgeConfig
 	ctx.Question.JudgeCase = questionResponse.JudgeCase
@@ -325,7 +328,8 @@ func (s *judgeService) normalJudge(ctx *entity.JudgeContext) bool {
 // 给通过的用户提供代码优化建议
 func (s *judgeService) aiSuggestion(ctx *entity.JudgeContext) error {
 	roleStr := "现在你是一位算法工程师，你将根据后面的题目的描述信息和实现代码，从时间复杂度和空间复杂度对代码做出评价，并给出代码的优化思路建议。对于接下来我给出的题目描述信息和题目实现代码，请严格按照如下格式给出回复(待优化代码和优化建议需要根据实际代码进行替换)：\n代码时间复杂度：xxx，空间复杂度：xxx。\n待优化代码：第x行到第x行：a=b;\n c = a;\n优化建议：c=b 直接将b赋值给c减少内存拷贝\n"
-	msg := roleStr + "\n" + ctx.Question.Title + "\n" + ctx.Question.Code
+	judgeCase, _ := json.Marshal(ctx.Question.JudgeCase)
+	msg := roleStr + "\n" + "题目标题：" + ctx.Question.Title + "\n" + "题目内容：" + ctx.Question.Content + "输入输出用例：" + string(judgeCase) + "\n" + "实现代码：" + ctx.Question.Code + "\n"
 	s.ai.SendMessage(msg)
 	resp, err := s.ai.ReceiveMessage()
 	if err != nil {

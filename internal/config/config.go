@@ -14,6 +14,8 @@ type Config struct {
 	Server        ServerConfig
 	Image         ImageConfig
 	AI            AIConfig
+	Log           LogConfig
+	Jwt           JWTConfig
 }
 
 type ElasticsearchConfig struct {
@@ -45,8 +47,8 @@ type RabbitMQConfig struct {
 	Password     string `mapstructure:"password"`
 	Host         string `mapstructure:"host"`
 	Port         int    `mapstructure:"port"`
+	PublishType  string `mapstructure:"publish_type"`
 	ExchangeName string `mapstructure:"exchange_name"`
-	ExchangeType string `mapstructure:"exchange_type"`
 	RoutingKey   string `mapstructure:"routing_key"`
 	QueueName    string `mapstructure:"queue_name"`
 	ConsumerTag  string `mapstructure:"consumer_tag"`
@@ -68,13 +70,23 @@ type AIConfig struct {
 
 type ImageConfig map[string]string
 
+type LogConfig struct {
+	OutputPaths      []string `mapstructure:"output_paths"`
+	ErrorOutputPaths []string `mapstructure:"error_output_paths"`
+}
+
+type JWTConfig struct {
+	Secret     string        `mapstructure:"secret"`
+	Expiration time.Duration `mapstructure:"expiration"`
+}
+
 func LoadConfig() Config {
 	//main执行的路径
-	//viper.AddConfigPath("internal/config/")
+	viper.AddConfigPath("internal/config/")
 	//service层执行的路径
 	//viper.AddConfigPath("../config/")
 	//repository层执行的路径
-	viper.AddConfigPath("../../config/")
+	//viper.AddConfigPath("../../config/")
 	//viper.AddConfigPath("./")
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")

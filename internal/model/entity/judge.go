@@ -14,6 +14,7 @@ type QuestionContext struct {
 	QuestionId  int
 	Language    string
 	Title       string
+	Content     string
 	Code        string
 	Answer      []string
 	Status      string

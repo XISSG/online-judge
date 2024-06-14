@@ -6,11 +6,13 @@ import (
 )
 
 func (redis *RedisClient) CacheSubmitList(submitList []*entity.Submit) error {
-	for i := range submitList {
-		err := cacheOrUpdateData[entity.Submit](redis, constant.SUBMIT_TABLE, submitList[i].ID, submitList[i].ID, submitList[i])
-		if err != nil {
-			return err
-		}
+	var ids []int
+	for _, q := range submitList {
+		ids = append(ids, q.ID)
+	}
+	err := cacheOrUpdateData[entity.Submit](redis, constant.QUESTION_TABLE, ids, ids, submitList)
+	if err != nil {
+		return err
 	}
 	return nil
 }

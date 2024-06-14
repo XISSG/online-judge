@@ -12,7 +12,7 @@ import (
 )
 
 type QuestionService interface {
-	CreateQuestion(question *request.Question) error
+	CreateQuestion(question *request.Question, userId int) error
 	SearchQuestion(query string) ([]*response.Question, error)
 	GetQuestionList(page, pageSize int) ([]*response.Question, error)
 	UpdateQuestion(question *request.UpdateQuestion) error
@@ -36,12 +36,18 @@ func NewQuestionService(mysql *mysql.MysqlClient, es *elastic.ESClient, redis *r
 	}
 }
 
-func (q *questionService) CreateQuestion(question *request.Question) error {
-	data := utils.ConvertQuestionEntity(question)
+func (q *questionService) CreateQuestion(question *request.Question, userId int) error {
+	data := utils.ConvertQuestionEntity(question, userId)
 	if data == nil {
 		return errors.New("data marshalling error")
 	}
-	return q.mysql.CreateQuestion(data)
+	err := q.mysql.CreateQuestion(data)
+	if err != nil {
+		return err
+	}
+	resp := utils.ConvertQuestionResponse(data)
+	err = q.es.IndexQuestion(resp)
+	return err
 }
 
 func (q *questionService) SearchQuestion(query string) ([]*response.Question, error) {

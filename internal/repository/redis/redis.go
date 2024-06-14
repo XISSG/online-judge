@@ -12,22 +12,26 @@ type RESPONSE interface {
 	entity.Question | entity.Submit
 }
 
-func cacheOrUpdateData[T RESPONSE](rdb *RedisClient, key string, score int, id int, t *T) error {
-	filed := strconv.Itoa(id)
-	member := redis.Z{
-		Score:  float64(score),
-		Member: filed,
+func cacheOrUpdateData[T RESPONSE](rdb *RedisClient, key string, scores []int, ids []int, ts []*T) error {
+	pipe := rdb.client.Pipeline()
+	for i, id := range ids {
+		filed := strconv.Itoa(id)
+		member := redis.Z{
+			Score:  float64(scores[i]),
+			Member: filed,
+		}
+		_, err := pipe.ZAdd(key, member).Result()
+		if err != nil {
+			return err
+		}
+		content := fmt.Sprintf("%v_content", key)
+		data, err := json.Marshal(ts[i])
+		_, err = pipe.HSet(content, filed, data).Result()
+		if err != nil {
+			return err
+		}
 	}
-	_, err := rdb.client.ZAdd(key, member).Result()
-	if err != nil {
-		return err
-	}
-	content := fmt.Sprintf("%v_content", key)
-	data, err := json.Marshal(t)
-	_, err = rdb.client.HSet(content, filed, data).Result()
-	if err != nil {
-		return err
-	}
+	_, err := pipe.Exec()
 	return err
 }
 

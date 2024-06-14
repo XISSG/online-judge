@@ -11,7 +11,7 @@ type RESPONSE interface {
 
 func createData[T RESPONSE](mysql *MysqlClient, table string, t *T) error {
 	tx := mysql.client.Begin()
-	tx.Model(table).Create(t)
+	tx.Table(table).Create(&t)
 	if tx.Error != nil {
 		tx.Rollback()
 		return tx.Error
@@ -22,7 +22,7 @@ func createData[T RESPONSE](mysql *MysqlClient, table string, t *T) error {
 
 func getDataById[T RESPONSE](mysql *MysqlClient, table string, id int) *T {
 	var t T
-	tx := mysql.client.Model(table).Where("id = ?", id).First(&t)
+	tx := mysql.client.Table(table).Where("id = ?", id).First(&t)
 	if tx.Error != nil {
 		return nil
 	}
@@ -31,7 +31,7 @@ func getDataById[T RESPONSE](mysql *MysqlClient, table string, id int) *T {
 
 func getDataList[T RESPONSE](mysql *MysqlClient, table string, page int, pageSize int) []*T {
 	var t []*T
-	tx := mysql.client.Model(table).Where("is_delete =?", constant.NOT_DELETED).Offset((page - 1) * pageSize).Limit(pageSize).Find(&t)
+	tx := mysql.client.Table(table).Where("is_delete =?", constant.NOT_DELETED).Order("update_time desc").Offset((page - 1) * pageSize).Limit(pageSize).Find(&t)
 	if tx.Error != nil {
 		return nil
 	}
@@ -40,7 +40,7 @@ func getDataList[T RESPONSE](mysql *MysqlClient, table string, page int, pageSiz
 
 func updateDataById[T RESPONSE](mysql *MysqlClient, table string, id int, t *T) error {
 	tx := mysql.client.Begin()
-	tx.Model(table).Where("id =?", id).Updates(*t)
+	tx.Table(table).Where("id =?", id).Updates(*t)
 	if tx.Error != nil {
 		tx.Rollback()
 		return tx.Error
@@ -51,7 +51,7 @@ func updateDataById[T RESPONSE](mysql *MysqlClient, table string, id int, t *T) 
 
 func deleteDataById(mysql *MysqlClient, table string, id int) error {
 	tx := mysql.client.Begin()
-	tx.Model(table).Where("id = ?", id).Update("is_delete", constant.DELETED)
+	tx.Table(table).Where("id = ?", id).Update("is_delete", constant.DELETED)
 	if tx.Error != nil {
 		tx.Rollback()
 		return tx.Error

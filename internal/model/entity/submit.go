@@ -7,8 +7,8 @@ type Submit struct {
 	//"用户代码"
 	Code string `json:"code" gorm:"column code; type: text; not null"`
 	//"判题信息json对象
-	JudgeResult string `json:"judge_info" gorm:"column judge_info; type: text;"`
-	//"判题状态（0-待判题,1-判题中,2-成功,3-失败)",
+	JudgeResult string `json:"judge_result" gorm:"column judge_result; type: text;"`
+	//判题状态
 	Status string `json:"status" gorm:"column status; type: int; default: 0; not null"`
 	//"判题id"
 	QuestionId int `json:"question_id" gorm:"index; column question_id; type: varchar(256); not null"`

@@ -37,7 +37,7 @@ func ConvertUserResponse(userEntity *entity.User) *response.User {
 	return userResponse
 }
 
-func ConvertQuestionEntity(questionRequest *request.Question) *entity.Question {
+func ConvertQuestionEntity(questionRequest *request.Question, userId int) *entity.Question {
 	var questionEntity *entity.Question
 
 	tag, err := json.Marshal(questionRequest.Tag)
@@ -51,6 +51,7 @@ func ConvertQuestionEntity(questionRequest *request.Question) *entity.Question {
 
 	questionEntity.AcceptNum = 0
 	questionEntity.SubmitNum = 0
+	questionEntity.UserId = userId
 	questionEntity.ID = Snowflake()
 	questionEntity.Tag = string(tag)
 	questionEntity.Answer = string(answer)

@@ -18,7 +18,8 @@ type UserService interface {
 	UpdateUserAvatar(userId int, avatar string) error
 	DeleteUserById(userId int) error
 	BanUserById(userId int) error
-	CheckUserLegal(userName, password string) bool
+	CheckUserNameAndPasswd(userName, password string) (bool, int, string)
+	CheckUserExists(userName string) bool
 }
 
 type userService struct {
@@ -114,12 +115,20 @@ func (s *userService) BanUserById(userId int) error {
 	return nil
 }
 
-func (s *userService) CheckUserLegal(userName, password string) bool {
+func (s *userService) CheckUserNameAndPasswd(userName, password string) (bool, int, string) {
 	user := s.mysql.GetUserByName(userName)
 	if user == nil {
-		return false
+		return false, 0, ""
 	}
 	if utils.MD5Crypt(password) != user.UserPassword {
+		return false, 0, ""
+	}
+	return true, user.ID, user.UserRole
+}
+
+func (s *userService) CheckUserExists(userName string) bool {
+	user := s.mysql.GetUserByName(userName)
+	if user == nil {
 		return false
 	}
 	return true

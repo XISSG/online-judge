@@ -11,7 +11,7 @@ import (
 
 func Test(t *testing.T) {
 	appConfig := config.LoadConfig()
-	client := NewAIClient(appConfig.AI.HostUrl, appConfig.AI.ApiKey, appConfig.AI.ApiSecret)
+	client := NewAIClient(appConfig.AI)
 
 	if client == nil {
 		panic(errors.New("client is nil"))

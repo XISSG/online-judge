@@ -12,7 +12,7 @@ import (
 )
 
 type SubmitService interface {
-	CreateSubmit(submit *request.Submit, userId int) error
+	CreateSubmit(submit *request.Submit, userId int) (int, error)
 	SearchSubmit(query string) ([]*response.Submit, error)
 	GetSubmitList(page, pageSize int) ([]*response.Submit, error)
 	UpdateSubmit(submit *request.UpdateSubmit) error
@@ -34,12 +34,20 @@ func NewSubmitService(mysql *mysql.MysqlClient, es *elastic.ESClient, redis *red
 	}
 }
 
-func (q *submitService) CreateSubmit(submit *request.Submit, userId int) error {
+func (q *submitService) CreateSubmit(submit *request.Submit, userId int) (int, error) {
 	data := utils.ConvertSubmitEntity(submit, userId)
 	if data == nil {
-		return errors.New("data marshalling error")
+		return 0, errors.New("data marshalling error")
 	}
-	return q.mysql.CreateSubmit(data)
+
+	err := q.mysql.CreateSubmit(data)
+	resp := utils.ConvertSubmitResponse(data)
+	err = q.es.IndexSubmit(resp)
+	if err != nil {
+		return 0, err
+	}
+
+	return data.ID, nil
 }
 
 func (q *submitService) SearchSubmit(query string) ([]*response.Submit, error) {

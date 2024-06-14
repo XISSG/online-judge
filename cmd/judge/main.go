@@ -9,7 +9,6 @@ import (
 	"github.com/xissg/online-judge/internal/repository/rabbitmq"
 	"github.com/xissg/online-judge/internal/repository/redis"
 	"github.com/xissg/online-judge/internal/service"
-	"strconv"
 )
 
 func main() {
@@ -25,15 +24,9 @@ func main() {
 	questionSvc := service.NewQuestionService(mysqlClient, esClient, redisClient)
 	submitSvc := service.NewSubmitService(mysqlClient, esClient, redisClient)
 	aiSvc := service.NewAIService(aiClient, appConfig.AI)
-
 	rabbitMqSvc := service.NewRabbitMqService(rabbitMqClient)
-	judgeSvc := service.NewJudgeService(dockerClient, questionSvc, submitSvc, aiSvc)
 
-	msgs, _ := rabbitMqSvc.Consume()
-	ch := make(chan struct{})
-	for msg := range msgs {
-		id, _ := strconv.Atoi(string(msg.Body))
-		judgeSvc.Start(id)
-	}
-	<-ch
+	judgeSvc := service.NewJudgeService(dockerClient, questionSvc, submitSvc, aiSvc, rabbitMqSvc)
+
+	rabbitMqSvc.Consume(judgeSvc.Run)
 }

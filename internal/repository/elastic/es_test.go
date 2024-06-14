@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/xissg/online-judge/internal/config"
+	"github.com/xissg/online-judge/internal/model/common"
 	"github.com/xissg/online-judge/internal/model/response"
 	"testing"
 	"time"
@@ -23,10 +24,9 @@ func TestQuestionSearch(t *testing.T) {
 		SubmitNum: 10,
 		AcceptNum: 1,
 		JudgeCase: []string{"test", "test"},
-		JudgeConfig: []response.Config{{
+		JudgeConfig: common.Config{
 			TimeLimit:   time.Hour,
 			MemoryLimit: 100,
-		},
 		},
 		UserId:     1,
 		CreateTime: time.Now().Format(time.RFC3339Nano),
@@ -50,7 +50,7 @@ func TestSubmitSearch(t *testing.T) {
 	var index *response.Submit
 	index = &response.Submit{
 		ID:          1,
-		JudgeResult: []string{"test"},
+		JudgeResult: "test",
 		QuestionId:  1,
 		UserId:      1,
 		Status:      "ACCEPTED",

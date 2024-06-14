@@ -1,0 +1,892 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/admin/create_question": {
+            "post": {
+                "description": "Create question",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "question"
+                ],
+                "summary": "Create question",
+                "parameters": [
+                    {
+                        "description": "create question",
+                        "name": "createRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.Question"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/delete_question": {
+            "get": {
+                "description": "Delete question",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "question"
+                ],
+                "summary": "Delete question",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "delete question",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/delete_submit": {
+            "get": {
+                "description": "Delete submit",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "submit"
+                ],
+                "summary": "Delete submit",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "delete submit",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/delete_user": {
+            "get": {
+                "description": "User registration",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "User registration",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "delete user by id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/get_users": {
+            "get": {
+                "description": "Get user list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Get user list",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "get user list by id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "get user list by name",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/invoke/count": {
+            "post": {
+                "description": "get api invoke count",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "invoke"
+                ],
+                "summary": "get api invoke count",
+                "parameters": [
+                    {
+                        "description": "invoke request",
+                        "name": "invokeRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.Invoke"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/update_question": {
+            "post": {
+                "description": "Update question",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "question"
+                ],
+                "summary": "Update question",
+                "parameters": [
+                    {
+                        "description": "update question",
+                        "name": "updateRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateQuestion"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/update_user": {
+            "post": {
+                "description": "Update user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Update user",
+                "parameters": [
+                    {
+                        "description": "update user",
+                        "name": "updateRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/question/get_questions": {
+            "get": {
+                "description": "get question list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "question"
+                ],
+                "summary": "get question list",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "page size",
+                        "name": "pageSize",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/question/search_questions": {
+            "get": {
+                "description": "Search question",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "question"
+                ],
+                "summary": "Search question",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "search question",
+                        "name": "keyword",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/submit/create_submit": {
+            "post": {
+                "description": "Create submit",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "submit"
+                ],
+                "summary": "Create submit",
+                "parameters": [
+                    {
+                        "description": "create submit",
+                        "name": "createRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.Submit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/submit/get_submits": {
+            "get": {
+                "description": "get submit list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "submit"
+                ],
+                "summary": "get submit list",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "page size",
+                        "name": "pageSize",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/submit/search_submits": {
+            "get": {
+                "description": "Search submit",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "submit"
+                ],
+                "summary": "Search submit",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "search submit",
+                        "name": "keyword",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/login": {
+            "post": {
+                "description": "User login",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "User login",
+                "parameters": [
+                    {
+                        "description": "user login",
+                        "name": "loginRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.Login"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/register": {
+            "post": {
+                "description": "User registration",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "User registration",
+                "parameters": [
+                    {
+                        "description": "create user",
+                        "name": "createRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/middlewares.Response"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "common.Config": {
+            "type": "object"
+        },
+        "middlewares.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.Body": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "data": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "maximum": 64
+                }
+            }
+        },
+        "request.Invoke": {
+            "type": "object",
+            "properties": {
+                "method": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.Login": {
+            "type": "object",
+            "required": [
+                "user_name",
+                "user_password"
+            ],
+            "properties": {
+                "user_name": {
+                    "type": "string"
+                },
+                "user_password": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.Question": {
+            "type": "object"
+        },
+        "request.Submit": {
+            "type": "object",
+            "required": [
+                "code",
+                "language",
+                "question_id"
+            ],
+            "properties": {
+                "code": {
+                    "description": "\"用户代码\"",
+                    "type": "string",
+                    "maxLength": 1024
+                },
+                "language": {
+                    "description": "\"编程语言\"",
+                    "type": "string",
+                    "maxLength": 64
+                },
+                "question_id": {
+                    "description": "\"判题id\"",
+                    "type": "integer",
+                    "maximum": 64
+                }
+            }
+        },
+        "request.UpdateQuestion": {
+            "type": "object",
+            "required": [
+                "id",
+                "user_id"
+            ],
+            "properties": {
+                "accept_num": {
+                    "description": "\"题目通过数\"",
+                    "type": "integer"
+                },
+                "answer": {
+                    "description": "\"题目答案,数组\"",
+                    "type": "array",
+                    "maxItems": 512,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "content": {
+                    "description": "\"内容\"",
+                    "type": "string",
+                    "maxLength": 1024
+                },
+                "id": {
+                    "type": "integer",
+                    "maximum": 64
+                },
+                "judge_case": {
+                    "description": "\"判题用例json数组,输入用例\"",
+                    "type": "array",
+                    "maxItems": 1024,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "judge_config": {
+                    "description": "\"判题配置json对象,内存限制，时间限制\"",
+                    "type": "array",
+                    "maxItems": 64,
+                    "items": {
+                        "$ref": "#/definitions/common.Config"
+                    }
+                },
+                "submit_num": {
+                    "description": "\"题目提交数",
+                    "type": "integer"
+                },
+                "tag": {
+                    "description": "\"标签列表json数组\"",
+                    "type": "array",
+                    "maxItems": 128,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "description": "\"标题\"",
+                    "type": "string",
+                    "maxLength": 512
+                },
+                "user_id": {
+                    "description": "\"创建用户id\"",
+                    "type": "integer",
+                    "maximum": 64
+                }
+            }
+        },
+        "request.UpdateUser": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/request.Body"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "password",
+                        "avatar"
+                    ]
+                }
+            }
+        },
+        "request.User": {
+            "type": "object",
+            "required": [
+                "user_name",
+                "user_password"
+            ],
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string",
+                    "maxLength": 64
+                },
+                "user_password": {
+                    "type": "string",
+                    "maxLength": 128
+                }
+            }
+        }
+    }
+}

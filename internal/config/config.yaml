@@ -21,8 +21,8 @@ RabbitMQ:
   password: "0709"
   host: "localhost"
   port: 5672
+  publish_type: "publish"
   exchange_name: "judge_exchange"
-  exchange_type: "direct"
   routing_key: "judge"
   queue_name: "judge_queue"
   consumer_tag: "judge_consumer"
@@ -42,5 +42,11 @@ AI:
   app_id: "3fd9659c"
   api_secret: "NDM4MjZjY2VkYzE0MzE5NWJlMGEyOTc1"
   api_key: "030ebc99d5951548bf7991edd9d83a2c"
-  flexibility: 4
-  randomness: 0.8
+  flexibility: 4 #灵活性1-6
+  randomness: 0.8 #随机性0-1
+Log: #输出路径的文件需提前创建
+  output_paths: [ "stdout","public/log/stdout.log" ]
+  error_output_paths: [ "public/log/error.log" ]
+Jwt:
+  secret: "secret_key"
+  expiration: 3600 #时间单位是秒
