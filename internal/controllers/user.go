@@ -27,23 +27,7 @@ func NewUserHandler(userService service.UserService, logger *zap.SugaredLogger) 
 	}
 }
 
-func (r *UserHandler) RegisterRoutes(router *gin.Engine) {
-	admin := router.Group("/admin")
-	admin.Use(middlewares.AuthAdmin())
-	{
-		admin.GET("/get_users", r.getUserList)
-		admin.POST("/update_user", r.updateUser)
-		admin.POST("/delete_user", r.deleteUser)
-	}
-	user := router.Group("/user")
-	{
-		user.POST("/register", r.register)
-		user.POST("/login", r.login)
-
-	}
-}
-
-// register
+// Register
 //
 //	@Summary		User registration
 //	@Description	User registration
@@ -55,13 +39,13 @@ func (r *UserHandler) RegisterRoutes(router *gin.Engine) {
 //	@Failure		400				{object}	middlewares.Response	"bad request"
 //	@Failure		500				{object}	middlewares.Response	"Internal Server Error"
 //	@Router			/user/register [post]
-func (r *UserHandler) register(ctx *gin.Context) {
+func (r *UserHandler) Register(ctx *gin.Context) {
 	//获取请求数据
 	user := request.User{}
 	err := ctx.ShouldBindJSON(&user)
 	if err != nil {
-		r.logger.Infof("register error: %v", err)
-		ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "register error"))
+		r.logger.Infof("Register error: %v", err)
+		ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "Register error"))
 		return
 	}
 
@@ -79,7 +63,7 @@ func (r *UserHandler) register(ctx *gin.Context) {
 	exist := r.userService.CheckUserExists(user.UserName)
 	if exist {
 		r.logger.Errorf("Register user name is already exist")
-		ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "register user name is already exist"))
+		ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "Register user name is already exist"))
 		return
 	}
 
@@ -92,43 +76,43 @@ func (r *UserHandler) register(ctx *gin.Context) {
 	}
 
 	//返回结果
-	ctx.Set("data", "register success")
+	ctx.Set("data", "Register success")
 }
 
-// login
+// Login
 //
-//	@Summary		User login
-//	@Description	User login
+//	@Summary		User Login
+//	@Description	User Login
 //	@Tags			user
 //	@Accept			json
 //	@Produce		json
-//	@Param			loginRequest	body		request.Login			true	"user login"
+//	@Param			loginRequest	body		request.Login			true	"user Login"
 //	@Success		200				{object}	middlewares.Response	"ok"
 //	@Failure		400				{object}	middlewares.Response	"bad request"
 //	@Failure		500				{object}	middlewares.Response	"Internal Server Error"
 //	@Router			/user/login [post]
-func (r *UserHandler) login(ctx *gin.Context) {
+func (r *UserHandler) Login(ctx *gin.Context) {
 	//获取请求数据
 	loginRequest := request.Login{}
 	err := ctx.ShouldBindJSON(&loginRequest)
 	if err != nil {
-		r.logger.Infof("login error: %v", err)
-		ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "login error"))
+		r.logger.Infof("Login error: %v", err)
+		ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "Login error"))
 		return
 	}
 
 	//校验数据
 	err = r.validator.Struct(loginRequest)
 	if err != nil {
-		r.logger.Infof("login error: %v", err)
-		ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "login error"))
+		r.logger.Infof("Login error: %v", err)
+		ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "Login error"))
 		return
 	}
 
 	//判断用户名和密码是否匹配
 	ok, userId, userRole := r.userService.CheckUserNameAndPasswd(loginRequest.UserName, loginRequest.UserPassword)
 	if !ok {
-		ctx.JSON(400, "login failed")
+		ctx.JSON(400, "Login failed")
 		return
 	}
 
@@ -137,7 +121,7 @@ func (r *UserHandler) login(ctx *gin.Context) {
 	tokenString, err := utils.Generate(userId, userRole, jwtConfig)
 	if err != nil {
 		r.logger.Errorf("generate token error: %v", err)
-		ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "login error"))
+		ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "Login error"))
 		return
 	}
 
@@ -145,20 +129,20 @@ func (r *UserHandler) login(ctx *gin.Context) {
 	ctx.Set("data", tokenString)
 }
 
-// getUserList
+// GetUserList
 //
 //	@Summary		Get user list
 //	@Description	Get user list
 //	@Tags			user
 //	@Accept			json
 //	@Produce		json
-//	@Param			id		query		string				true	"get user list by id"
-//	@Param			name	query		string				true	"get user list by name"
+//	@Param			id		query		string				false	"get user list by id"
+//	@Param			name	query		string				false	"get user list by name"
 //	@Success		200		{object}	middlewares.Response	"ok"
 //	@Failure		400		{object}	middlewares.Response	"bad request"
 //	@Failure		500		{object}	middlewares.Response	"Internal Server Error"
-//	@Router			/admin/get_users [get]
-func (r *UserHandler) getUserList(ctx *gin.Context) {
+//	@Router			/admin/user/get_users [get]
+func (r *UserHandler) GetUserList(ctx *gin.Context) {
 	//获取请求数据
 	idStr := ctx.Query("id")
 	name := ctx.Query("name")
@@ -185,7 +169,7 @@ func (r *UserHandler) getUserList(ctx *gin.Context) {
 	}
 }
 
-// updateUser
+// UpdateUser
 //
 //	@Summary		Update user
 //	@Description	Update user
@@ -196,8 +180,8 @@ func (r *UserHandler) getUserList(ctx *gin.Context) {
 //	@Success		200				{object}	middlewares.Response	"ok"
 //	@Failure		400				{object}	middlewares.Response	"bad request"
 //	@Failure		500				{object}	middlewares.Response	"Internal Server Error"
-//	@Router			/admin/update_user [post]
-func (r *UserHandler) updateUser(ctx *gin.Context) {
+//	@Router			/admin/user/update_user [post]
+func (r *UserHandler) UpdateUser(ctx *gin.Context) {
 	//获取请求数据
 	updateRequest := request.UpdateUser{}
 	err := ctx.ShouldBindJSON(&updateRequest)
@@ -210,7 +194,7 @@ func (r *UserHandler) updateUser(ctx *gin.Context) {
 	//判断数据类型
 	if updateRequest.Type == "password" {
 		//更新结果并返回
-		err := r.userService.UpdateUserPassword(updateRequest.Body.ID, updateRequest.Body.Data)
+		err := r.userService.UpdateUserPassword(updateRequest.ID, updateRequest.Data)
 		if err != nil {
 			r.logger.Errorf("Error updating user password error %v", err)
 			ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "Error updating user password"))
@@ -222,7 +206,7 @@ func (r *UserHandler) updateUser(ctx *gin.Context) {
 
 	if updateRequest.Type == "avatar" {
 		//更新结果并返回
-		err := r.userService.UpdateUserAvatar(updateRequest.Body.ID, updateRequest.Body.Data)
+		err := r.userService.UpdateUserAvatar(updateRequest.ID, updateRequest.Data)
 		if err != nil {
 			r.logger.Errorf("Error updating user avatar error %v", err)
 			ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "Error updating user avatar"))
@@ -236,7 +220,7 @@ func (r *UserHandler) updateUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusBadRequest, "update data type must be password or avatar")
 }
 
-// deleteUser
+// DeleteUser
 //
 //	@Summary		User registration
 //	@Description	User registration
@@ -247,8 +231,8 @@ func (r *UserHandler) updateUser(ctx *gin.Context) {
 //	@Success		200	{object}	middlewares.Response	"ok"
 //	@Failure		400	{object}	middlewares.Response	"bad request"
 //	@Failure		500	{object}	middlewares.Response	"Internal Server Error"
-//	@Router			/admin/delete_user [get]
-func (r *UserHandler) deleteUser(ctx *gin.Context) {
+//	@Router			/admin/user/delete_user [get]
+func (r *UserHandler) DeleteUser(ctx *gin.Context) {
 	//获取请求数据
 	idStr := ctx.Query("id")
 	if idStr == "" {
@@ -268,6 +252,44 @@ func (r *UserHandler) deleteUser(ctx *gin.Context) {
 	if err != nil {
 		r.logger.Errorf("delete user error: %v", err)
 		ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "delete user error"))
+		return
+	}
+
+	//返回结果
+	ctx.Set("data", "success")
+}
+
+// BanUser
+//
+//	@Summary		User registration
+//	@Description	User registration
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	query		string					true	"ban user by id"
+//	@Success		200	{object}	middlewares.Response	"ok"
+//	@Failure		400	{object}	middlewares.Response	"bad request"
+//	@Failure		500	{object}	middlewares.Response	"Internal Server Error"
+//	@Router			/admin/user/ban_user [get]
+func (r *UserHandler) BanUser(ctx *gin.Context) {
+	//获取请求数据
+	idStr := ctx.Query("id")
+	if idStr == "" {
+		r.logger.Infof("invalid id")
+		ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "invalid id"))
+		return
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		r.logger.Infof("invalid id")
+		ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "invalid id"))
+		return
+	}
+
+	err = r.userService.BanUserById(id)
+	if err != nil {
+		r.logger.Errorf("ban user error: %v", err)
+		ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "ban user error"))
 		return
 	}
 

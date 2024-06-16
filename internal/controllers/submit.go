@@ -27,23 +27,7 @@ func NewSubmitHandler(submitService service.SubmitService, rabbitMqService servi
 	}
 }
 
-func (r *SubmitHandler) RegisterRoutes(router *gin.Engine) {
-	admin := router.Group("/admin")
-	admin.Use(middlewares.AuthAdmin())
-	{
-		admin.GET("/delete_submit", r.deleteSubmit)
-	}
-
-	submit := router.Group("/submit")
-	submit.Use(middlewares.AuthLogin())
-	{
-		submit.POST("/create_submit", r.createSubmit)
-		submit.GET("/get_submits", r.getSubmitList)
-		submit.GET("/search_submits", r.searchSubmitList)
-	}
-}
-
-// createSubmit
+// CreateSubmit
 //
 //	@Summary		Create submit
 //	@Description	Create submit
@@ -54,13 +38,13 @@ func (r *SubmitHandler) RegisterRoutes(router *gin.Engine) {
 //	@Success		200				{object}	middlewares.Response	"ok"
 //	@Failure		400				{object}	middlewares.Response	"bad request"
 //	@Failure		500				{object}	middlewares.Response	"Internal Server Error"
-//	@Router			/submit/create_submit [post]
-func (r *SubmitHandler) createSubmit(ctx *gin.Context) {
+//	@Router			/user/submit/create_submit [post]
+func (r *SubmitHandler) CreateSubmit(ctx *gin.Context) {
 	//判断用户是否已登录
 	userId, exist := ctx.Get("user")
 	if !exist {
 		r.logger.Infof("authorization error")
-		ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "you must login first"))
+		ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "you must Login first"))
 		return
 	}
 
@@ -91,6 +75,7 @@ func (r *SubmitHandler) createSubmit(ctx *gin.Context) {
 
 	//将提交信息推送到消息队列
 	id := strconv.FormatInt(int64(idInt), 10)
+	r.logger.Infof("publish submit id")
 	err = r.rabbitMqService.Publish(id)
 	if err != nil {
 		r.logger.Infof("submit publish error %v", err)
@@ -100,7 +85,7 @@ func (r *SubmitHandler) createSubmit(ctx *gin.Context) {
 	ctx.Set("data", "submit success")
 }
 
-// getSubmitList
+// GetSubmitList
 //
 //	@Summary		get submit list
 //	@Description	get submit list
@@ -108,12 +93,12 @@ func (r *SubmitHandler) createSubmit(ctx *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			page		query		string					true	"page number"
-//	@Param			pageSize	query		string					true	"page size"
+//	@Param			page_size	query		string					true	"page size"
 //	@Success		200			{object}	middlewares.Response	"ok"
 //	@Failure		400			{object}	middlewares.Response	"bad request"
 //	@Failure		500			{object}	middlewares.Response	"Internal Server Error"
-//	@Router			/submit/get_submits [get]
-func (r *SubmitHandler) getSubmitList(ctx *gin.Context) {
+//	@Router			/user/submit/get_submits [get]
+func (r *SubmitHandler) GetSubmitList(ctx *gin.Context) {
 	//获取请求数据
 	page := ctx.Query("page")
 	pageSize := ctx.Query("page_size")
@@ -144,7 +129,7 @@ func (r *SubmitHandler) getSubmitList(ctx *gin.Context) {
 	ctx.Set("data", submits)
 }
 
-// searchSubmit
+// SearchSubmitList
 //
 //	@Summary		Search submit
 //	@Description	Search submit
@@ -155,8 +140,8 @@ func (r *SubmitHandler) getSubmitList(ctx *gin.Context) {
 //	@Success		200		{object}	middlewares.Response	"ok"
 //	@Failure		400		{object}	middlewares.Response	"bad request"
 //	@Failure		500		{object}	middlewares.Response	"Internal Server Error"
-//	@Router			/submit/search_submits [get]
-func (r *SubmitHandler) searchSubmitList(ctx *gin.Context) {
+//	@Router			/user/submit/search_submits [get]
+func (r *SubmitHandler) SearchSubmitList(ctx *gin.Context) {
 	//获取请求数据
 	keyword := ctx.Query("keyword")
 	if keyword == "" {
@@ -176,7 +161,7 @@ func (r *SubmitHandler) searchSubmitList(ctx *gin.Context) {
 	ctx.Set("data", submits)
 }
 
-// deleteSubmit
+// DeleteSubmit
 //
 //	@Summary		Delete submit
 //	@Description	Delete submit
@@ -187,8 +172,8 @@ func (r *SubmitHandler) searchSubmitList(ctx *gin.Context) {
 //	@Success		200	{object}	middlewares.Response	"ok"
 //	@Failure		400	{object}	middlewares.Response	"bad request"
 //	@Failure		500	{object}	middlewares.Response	"Internal Server Error"
-//	@Router			/admin/delete_submit [get]
-func (r *SubmitHandler) deleteSubmit(ctx *gin.Context) {
+//	@Router			/admin/submit/delete_submit [get]
+func (r *SubmitHandler) DeleteSubmit(ctx *gin.Context) {
 	//获取请求数据
 	idStr := ctx.Query("id")
 	if idStr == "" {

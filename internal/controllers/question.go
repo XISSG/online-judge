@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/xissg/online-judge/internal/middlewares"
+	"github.com/xissg/online-judge/internal/model/common"
 	"github.com/xissg/online-judge/internal/model/request"
 	"github.com/xissg/online-judge/internal/service"
 	"go.uber.org/zap"
@@ -25,24 +26,7 @@ func NewQuestionHandler(questionService service.QuestionService, logger *zap.Sug
 	}
 }
 
-func (r *QuestionHandler) RegisterRoutes(router *gin.Engine) {
-	admin := router.Group("/admin")
-	admin.Use(middlewares.AuthAdmin())
-	{
-		admin.POST("/create_question", r.createQuestion)
-		admin.POST("/update_question", r.updateQuestion)
-		admin.GET("/delete_question", r.deleteQuestion)
-	}
-
-	question := router.Group("/question")
-	question.Use(middlewares.AuthLogin())
-	{
-		question.GET("/get_questions", r.getQuestionList)
-		question.GET("/search_questions", r.searchQuestionList)
-	}
-}
-
-// createQuestion
+// CreateQuestion
 //
 //	@Summary		Create question
 //	@Description	Create question
@@ -53,10 +37,12 @@ func (r *QuestionHandler) RegisterRoutes(router *gin.Engine) {
 //	@Success		200				{object}	middlewares.Response	"ok"
 //	@Failure		400				{object}	middlewares.Response	"bad request"
 //	@Failure		500				{object}	middlewares.Response	"Internal Server Error"
-//	@Router			/admin/create_question [post]
-func (r *QuestionHandler) createQuestion(ctx *gin.Context) {
+//	@Router			/admin/question/create_question [post]
+func (r *QuestionHandler) CreateQuestion(ctx *gin.Context) {
 	//获取请求数据
-	req := request.Question{}
+	req := request.Question{
+		JudgeConfig: &common.Config{},
+	}
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		r.logger.Infof("question request error %v", err)
@@ -85,7 +71,7 @@ func (r *QuestionHandler) createQuestion(ctx *gin.Context) {
 	ctx.Set("data", "create question success")
 }
 
-// updateQuestion
+// UpdateQuestion
 //
 //	@Summary		Update question
 //	@Description	Update question
@@ -96,8 +82,8 @@ func (r *QuestionHandler) createQuestion(ctx *gin.Context) {
 //	@Success		200				{object}	middlewares.Response	"ok"
 //	@Failure		400				{object}	middlewares.Response	"bad request"
 //	@Failure		500				{object}	middlewares.Response	"Internal Server Error"
-//	@Router			/admin/update_question [post]
-func (r *QuestionHandler) updateQuestion(ctx *gin.Context) {
+//	@Router			/admin/question/update_question [post]
+func (r *QuestionHandler) UpdateQuestion(ctx *gin.Context) {
 	//获取请求数据
 	req := request.UpdateQuestion{}
 	err := ctx.ShouldBindJSON(&req)
@@ -127,7 +113,7 @@ func (r *QuestionHandler) updateQuestion(ctx *gin.Context) {
 	ctx.Set("data", "update question success")
 }
 
-// getQuestionList
+// GetQuestionList
 //
 //	@Summary		get question list
 //	@Description	get question list
@@ -135,12 +121,12 @@ func (r *QuestionHandler) updateQuestion(ctx *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			page		query		string					true	"page number"
-//	@Param			pageSize	query		string					true	"page size"
+//	@Param			page_size	query		string					true	"page size"
 //	@Success		200			{object}	middlewares.Response	"ok"
 //	@Failure		400			{object}	middlewares.Response	"bad request"
 //	@Failure		500			{object}	middlewares.Response	"Internal Server Error"
-//	@Router			/question/get_questions [get]
-func (r *QuestionHandler) getQuestionList(ctx *gin.Context) {
+//	@Router			/user/question/get_questions [get]
+func (r *QuestionHandler) GetQuestionList(ctx *gin.Context) {
 	//获取请求数据
 	page := ctx.Query("page")
 	pageSize := ctx.Query("page_size")
@@ -173,7 +159,7 @@ func (r *QuestionHandler) getQuestionList(ctx *gin.Context) {
 	ctx.Set("data", questions)
 }
 
-// searchQuestion
+// SearchQuestionList
 //
 //	@Summary		Search question
 //	@Description	Search question
@@ -184,8 +170,8 @@ func (r *QuestionHandler) getQuestionList(ctx *gin.Context) {
 //	@Success		200		{object}	middlewares.Response	"ok"
 //	@Failure		400		{object}	middlewares.Response	"bad request"
 //	@Failure		500		{object}	middlewares.Response	"Internal Server Error"
-//	@Router			/question/search_questions [get]
-func (r *QuestionHandler) searchQuestionList(ctx *gin.Context) {
+//	@Router			/user/question/search_questions [get]
+func (r *QuestionHandler) SearchQuestionList(ctx *gin.Context) {
 	//获取请求数据
 	keyword := ctx.Query("keyword")
 
@@ -207,7 +193,7 @@ func (r *QuestionHandler) searchQuestionList(ctx *gin.Context) {
 	ctx.Set("data", question)
 }
 
-// deleteQuestion
+// DeleteQuestion
 //
 //	@Summary		Delete question
 //	@Description	Delete question
@@ -218,8 +204,8 @@ func (r *QuestionHandler) searchQuestionList(ctx *gin.Context) {
 //	@Success		200	{object}	middlewares.Response	"ok"
 //	@Failure		400	{object}	middlewares.Response	"bad request"
 //	@Failure		500	{object}	middlewares.Response	"Internal Server Error"
-//	@Router			/admin/delete_question [get]
-func (r *QuestionHandler) deleteQuestion(ctx *gin.Context) {
+//	@Router			/admin/question/delete_question [get]
+func (r *QuestionHandler) DeleteQuestion(ctx *gin.Context) {
 	//获取请求数据
 	idStr := ctx.Query("id")
 

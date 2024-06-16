@@ -1,0 +1,229 @@
+# curl -X 'GET'
+#  'http://localhost:8082/picture/avatar'
+#  -H 'accept: application/json'
+GET http://localhost:8082/user/picture/avatar
+accept: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNlQyMjo1MjowMS45MzkzNTY1MjIrMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.J6g9kOqXNj5JS89ICUwDYFZ1DtiNi2aS5roOaemfDqU
+
+###
+
+# curl -X 'GET'
+#  'http://localhost:8082/admin/user/get_users?name=xissg'
+#  -H 'accept: application/json'
+GET http://localhost:8082/admin/user/get_users?id=1801822806736900096
+accept: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNVQxMzoxNjoxNi43NDg5ODg1NzErMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.rWC0ZFpzo5VbVdwT5hrOJWPKnOUZhBaB1n8G2LwuGZo
+###
+
+# curl -X 'POST'
+#  'http://localhost:8082/admin/user/update_user'
+#  -H 'accept: application/json'
+#  -H 'Content-Type: application/json'
+#  -d '{
+#  "data": "string",
+#  "id": 64,
+#  "type": "password"
+#}'
+POST http://localhost:8082/admin/user/update_user
+accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNVQxMzoxNjoxNi43NDg5ODg1NzErMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.rWC0ZFpzo5VbVdwT5hrOJWPKnOUZhBaB1n8G2LwuGZo
+
+{
+  "data": "https://www.github.com/xissg",
+  "id": 1801822806736900096,
+  "type": "avatar"
+}
+
+###
+# curl -X 'GET'
+#  'http://localhost:8082/admin/user/delete_user?id=1'
+#  -H 'accept: application/json'
+GET http://localhost:8082/admin/user/delete_user?id=1
+accept: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNVQxMzoxNjoxNi43NDg5ODg1NzErMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.rWC0ZFpzo5VbVdwT5hrOJWPKnOUZhBaB1n8G2LwuGZo
+
+###
+GET http://localhost:8082/admin/user/ban_user?id=1
+accept: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNVQxMzoxNjoxNi43NDg5ODg1NzErMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.rWC0ZFpzo5VbVdwT5hrOJWPKnOUZhBaB1n8G2LwuGZo
+
+###
+
+# curl -X 'POST'
+#  'http://localhost:8082/admin/invoke/count'
+#  -H 'accept: application/json'
+#  -H 'Content-Type: application/json'
+#  -d '{
+#  "method": "GET",
+#  "path": "/admin/user/get_users"
+#}'
+POST http://localhost:8082/admin/invoke/count
+accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNVQxMzoxNjoxNi43NDg5ODg1NzErMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.rWC0ZFpzo5VbVdwT5hrOJWPKnOUZhBaB1n8G2LwuGZo
+
+{
+  "method": "GET",
+  "path": "/admin/user/get_users"
+}
+
+###
+# curl -X 'POST'
+#  'http://localhost:8082/admin/question/create_question'
+#  -H 'accept: application/json'
+#  -H 'Content-Type: application/json'
+#  -d '{}'
+POST http://localhost:8082/admin/question/create_question
+accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNVQyMzozMjozOS45NTg0NzQwMTErMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.OJrWWyQJr9UTKdeMGj3gNz3yXbOeflb5zfpy_bXSr7o
+
+{
+  "title": "数组求和",
+  "content": "给定一个包含若干整数的数组，要求你计算这些整数的总和。如果数组为空，则返回0。",
+  "tag": [
+    "数组"
+  ],
+  "judge_case": [
+    "5\n 1 2 3 4 5",
+    "0"
+  ],
+  "answer": [
+    "15",
+    "0"
+  ],
+  "judge_config": {
+    "time_limit": 1000,
+    "memory_limit": 1000
+  }
+}
+
+###
+# curl -X 'GET'
+#  'http://localhost:8082/user/question/get_questions?page=1&pageSize=10'
+#  -H 'accept: application/json'
+GET http://localhost:8082/user/question/get_questions?page=1&page_size=10
+accept: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNVQyMzozMjozOS45NTg0NzQwMTErMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.OJrWWyQJr9UTKdeMGj3gNz3yXbOeflb5zfpy_bXSr7o
+
+###
+# curl -X 'GET'
+#  'http://localhost:8082/user/question/search_questions?keyword=%E6%95%B0%E7%BB%84'
+#  -H 'accept: application/json'
+GET http://localhost:8082/user/question/search_questions?keyword=%E6%95%B0%E7%BB%84
+accept: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNVQyMzozMjozOS45NTg0NzQwMTErMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.OJrWWyQJr9UTKdeMGj3gNz3yXbOeflb5zfpy_bXSr7o
+###
+# curl -X 'POST'
+#  'http://localhost:8082/admin/question/update_question'
+#  -H 'accept: application/json'
+#  -H 'Content-Type: application/json'
+#  -d '{
+#  "accept_num": 0,
+#  "answer": [
+#    "string"
+#  ],
+#  "content": "string",
+#  "id": 10000000000000000000,
+#  "judge_case": [
+#    "string"
+#  ],
+#  "judge_config": [
+#    {}
+#  ],
+#  "submit_num": 0,
+#  "tag": [
+#    "string"
+#  ],
+#  "title": "string",
+#  "user_id": 64
+#}'
+POST http://localhost:8082/admin/question/update_question
+accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNVQyMzozMjozOS45NTg0NzQwMTErMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.OJrWWyQJr9UTKdeMGj3gNz3yXbOeflb5zfpy_bXSr7o
+
+{
+  "accept_num": 1,
+  "id": 1801854875089244160,
+  "submit_num": 2
+}
+
+###
+# curl -X 'GET'
+#  'http://localhost:8082/admin/question/delete_question?id=1'
+#  -H 'accept: application/json'
+GET http://localhost:8082/admin/question/delete_question?id=1
+accept: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNVQyMzozMjozOS45NTg0NzQwMTErMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.OJrWWyQJr9UTKdeMGj3gNz3yXbOeflb5zfpy_bXSr7o
+
+###
+POST http://localhost:8082/user/submit/create_submit
+accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNVQyMzozMjozOS45NTg0NzQwMTErMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.OJrWWyQJr9UTKdeMGj3gNz3yXbOeflb5zfpy_bXSr7o
+
+{
+  "code": "package main\n\nimport (\n\t\"fmt\"\n)\n\nfunc main() {\n\tvar t int\n\tfmt.Scan(&t) // 读取测试用例的数量\n\n\tfor i := 0; i < t; i++ {\n\t\tvar a, b int\n\t\tfmt.Scan(&a, &b) // 读取两个整数\n\t\tfmt.Println(a + b) // 输出它们的和\n\t}\n}",
+  "language": "go",
+  "question_id": 1801907946771189760
+}
+
+###
+POST http://localhost:8082/admin/question/create_question
+accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNVQyMzozMjozOS45NTg0NzQwMTErMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.OJrWWyQJr9UTKdeMGj3gNz3yXbOeflb5zfpy_bXSr7o
+
+{
+  "title": "给定两个整数A和B，计算它们的和。",
+  "content": "输入格式第一行包含一个整数T，表示测试用例的数量。接下来的T 行，每行包含两个整数A和B。输出格式对于每个测试用例，输出一行，包含一个整数，表示A和B的和。",
+  "tag": [
+    "数组"
+  ],
+  "judge_case": [
+    "3\n 1 2\n100 200\n-10 20"
+  ],
+  "answer": [
+    "3\n300\n10"
+  ],
+  "judge_config": {
+    "time_limit": 1000,
+    "memory_limit": 1000
+  }
+}
+
+###
+GET http://localhost:8082/user/question/search_questions?keyword=%e6%95%b0%e7%bb%84
+accept: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNlQyMjo1MjowMS45MzkzNTY1MjIrMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.J6g9kOqXNj5JS89ICUwDYFZ1DtiNi2aS5roOaemfDqU
+###
+
+# curl -X 'GET'
+#  'http://localhost:8082/user/submit/get_submits?page=1&pageSize=10'
+#  -H 'accept: application/json'
+GET http://localhost:8082/user/submit/get_submits?page=1&page_size=10
+accept: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNVQyMzozMjozOS45NTg0NzQwMTErMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.OJrWWyQJr9UTKdeMGj3gNz3yXbOeflb5zfpy_bXSr7o
+
+###
+# curl -X 'GET'
+#  'http://localhost:8082/user/submit/search_submits?keyword=success'
+#  -H 'accept: application/json'
+GET http://localhost:8082/user/submit/search_submits?keyword=success
+accept: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNVQyMzozMjozOS45NTg0NzQwMTErMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.OJrWWyQJr9UTKdeMGj3gNz3yXbOeflb5zfpy_bXSr7o
+
+###
+# curl -X 'GET'
+#  'http://localhost:8082/admin/submit/delete_submit?id=1801871513704468480'
+#  -H 'accept: application/json'
+GET http://localhost:8082/admin/submit/delete_submit?id=1801874182649155584
+accept: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNVQyMzozMjozOS45NTg0NzQwMTErMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.OJrWWyQJr9UTKdeMGj3gNz3yXbOeflb5zfpy_bXSr7o
+
+###
+
+
+

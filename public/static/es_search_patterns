@@ -1,0 +1,56 @@
+//全部匹配
+// GET /my_index/_search
+//
+//	{
+//	 "query": {
+//	   "match_all": {}
+//	 }
+//	}
+
+//关键字，单字段搜索
+// GET /my_index/_search
+//
+//	{
+//	 "query": {
+//	   "match": {
+//	     "content": "Elasticsearch"
+//	   }
+//	 }
+//	}
+
+//关键字，单字段，指定字段类型，精确搜索
+// GET /my_index/_search
+//
+//	{
+//	 "query": {
+//	   "term": {
+//	     "content.keyword": "Elasticsearch"
+//	   }
+//	 }
+//	}
+
+//关键字，多字段，交集搜索
+// GET /my_index/_search
+//
+//	{
+//	 "query": {
+//	   "bool": {
+//	     "must": [
+//	       { "match": { "content": "Elasticsearch" } },
+//	       { "match": { "title": "Guide" } }
+//	     ]
+//	   }
+//	 }
+//	}
+
+//关键字，多字段，并集搜索
+// GET /my_index/_search
+//
+//	{
+//	 "query": {
+//	   "multi_match": {
+//	     "query": "Elasticsearch",
+//	     "fields": ["title", "content"]
+//	   }
+//	 }
+//	}

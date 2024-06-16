@@ -12,11 +12,7 @@ type Login struct {
 }
 
 type UpdateUser struct {
+	ID   int    `json:"id" validate:"required"`
 	Type string `json:"type" validate:"oneof=password avatar"`
-	Body Body   `json:"data"`
-}
-
-type Body struct {
-	ID   int    `json:"id" validate:"max=64,required"`
 	Data string `json:"data"`
 }

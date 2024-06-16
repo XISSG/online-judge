@@ -9,7 +9,7 @@ PUT /submit/
   "mappings": {
     "properties": {
       "id": {
-        "type": "integer"
+        "type": "keyword"
       },
       "judge_info": {
         "type": "text",
@@ -20,10 +20,10 @@ PUT /submit/
         "analyzer": "ik_smart"
       },
       "question_id": {
-        "type": "integer"
+        "type": "keyword"
       },
       "user_id": {
-        "type": "integer"
+        "type": "keyword"
       },
       "create_time": {
         "type": "date",

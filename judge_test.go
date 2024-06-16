@@ -1,7 +1,8 @@
-package main
+package online_judge
 
 import (
 	"github.com/xissg/online-judge/internal/config"
+	logger2 "github.com/xissg/online-judge/internal/logger"
 	"github.com/xissg/online-judge/internal/repository/ai"
 	"github.com/xissg/online-judge/internal/repository/docker"
 	"github.com/xissg/online-judge/internal/repository/elastic"
@@ -9,10 +10,12 @@ import (
 	"github.com/xissg/online-judge/internal/repository/rabbitmq"
 	"github.com/xissg/online-judge/internal/repository/redis"
 	"github.com/xissg/online-judge/internal/service"
+	"testing"
 )
 
-func main() {
+func TestJudge(t *testing.T) {
 	appConfig := config.LoadConfig()
+	logger, _ := logger2.NewLogger(appConfig.Log)
 
 	dockerClient := docker.NewDockerClient()
 	mysqlClient := mysql.NewMysqlClient(appConfig.Database)
@@ -26,7 +29,7 @@ func main() {
 	aiSvc := service.NewAIService(aiClient, appConfig.AI)
 	rabbitMqSvc := service.NewRabbitMqService(rabbitMqClient)
 
-	judgeSvc := service.NewJudgeService(dockerClient, questionSvc, submitSvc, aiSvc)
+	judgeSvc := service.NewJudgeService(dockerClient, questionSvc, submitSvc, aiSvc, logger)
 
 	rabbitMqSvc.Consume(judgeSvc.Run)
 }

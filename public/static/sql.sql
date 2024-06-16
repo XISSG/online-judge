@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `question`
     `id`           bigint comment "id" primary key,
     `title`        varchar(512)      null comment "标题",
     `content`      text              null comment "内容",
-    `tag`         varchar(1024)     null comment "标签列表json数组",
+    `tags`         varchar(1024)     null comment "标签列表json数组",
     `answer`       text              null comment "题目答案",
     `submit_num`   int     default 0 not null comment "题目提交数",
     `accept_num`   int     default 0 not null comment "题目通过数",

@@ -6,13 +6,17 @@ import (
 	"github.com/xissg/online-judge/internal/constant"
 	"github.com/xissg/online-judge/internal/model/entity"
 	"github.com/xissg/online-judge/internal/utils"
+	"go.uber.org/zap"
+	"net/http"
 	"time"
 )
 
-func AuthLogin() gin.HandlerFunc {
+func AuthLogin(logger *zap.SugaredLogger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		data, ok := parseAuthInfo(c)
 		if !ok {
+			logger.Infof("user authentication failed")
+			c.JSON(http.StatusBadRequest, ErrorResponse(http.StatusBadRequest, "user authentication failed"))
 			c.Abort()
 			return
 		}
@@ -21,15 +25,24 @@ func AuthLogin() gin.HandlerFunc {
 	}
 }
 
-func AuthAdmin() gin.HandlerFunc {
+func AuthAdmin(logger *zap.SugaredLogger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		data, ok := parseAuthInfo(c)
-		if !ok && data.UserRole != constant.ADMIN {
+		if !ok {
+			logger.Infof("admin user authentication failed")
+			c.JSON(http.StatusBadRequest, ErrorResponse(http.StatusBadRequest, "user authentication failed"))
 			c.Abort()
 			return
 		}
 
+		if data.UserRole != constant.ADMIN {
+			logger.Infof("admin user authentication failed")
+			c.JSON(http.StatusBadRequest, ErrorResponse(http.StatusBadRequest, "user authentication failed"))
+			c.Abort()
+			return
+		}
 		c.Set("user", data.ID)
+		c.Next()
 	}
 }
 

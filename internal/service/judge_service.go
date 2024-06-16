@@ -12,13 +12,13 @@ import (
 	"github.com/xissg/online-judge/internal/model/request"
 	"github.com/xissg/online-judge/internal/repository/docker"
 	"github.com/xissg/online-judge/internal/utils"
-	"log"
+	"go.uber.org/zap"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 )
 
 type JudgeService interface {
@@ -30,68 +30,87 @@ type judgeService struct {
 	question QuestionService
 	submit   SubmitService
 	ai       AIService
-	service  RabbitMqService
+	logger   *zap.SugaredLogger
 }
 
-func NewJudgeService(docker *docker.DockerClient, question QuestionService, submit SubmitService, ai AIService, service RabbitMqService) JudgeService {
+func NewJudgeService(docker *docker.DockerClient, question QuestionService, submit SubmitService, ai AIService, logger *zap.SugaredLogger) JudgeService {
 	return &judgeService{
 		docker:   docker,
 		question: question,
 		submit:   submit,
 		ai:       ai,
-		service:  service,
+		logger:   logger,
 	}
 }
 
 func (s *judgeService) Run(id string) {
+	var err error
 	submitId, _ := strconv.Atoi(id)
+
 	//判题校验，已判题或正在判题的直接返回
+	s.logger.Infof("start judge service")
 	submit, _ := s.submit.GetSubmitById(submitId)
 	if submit.Status != constant.WATING_STATUS {
+		s.logger.Infof("already judged, status: %v", submit.Status)
 		return
 	}
 
 	//更新判题状态
-	s.submit.UpdateSubmit(&request.UpdateSubmit{
+	s.logger.Infof("update submit judge status")
+	err = s.submit.UpdateSubmit(&request.UpdateSubmit{
 		ID:     submitId,
 		Status: constant.JUDGING_STATUS,
 	})
 
-	//开始判题
+	//开始初始化必要信息
+	s.logger.Infof("start init judge context")
 	ctx := initJudgeContext("/app")
-	s.receiveSubmit(submitId, ctx)
-	s.receiveQuestion(submitId, ctx)
-	err := s.chooseImage(ctx)
+	err = s.receiveSubmit(submitId, ctx)
+	err = s.receiveQuestion(ctx.Question.QuestionId, ctx)
+	s.logger.Infof("start init docker image")
+	err = s.chooseImage(ctx)
 	if err != nil {
 		return
 	}
 
 	//生成文件，沙箱执行，获取结果
-	s.generateFiles(ctx)
-	s.startSandbox(ctx)
-	s.getResult(ctx)
+	s.logger.Infof("start generate files")
+	err = s.generateFiles(ctx)
+	s.logger.Infof("start start sanbox")
+	err = s.startSandbox(ctx)
+	s.logger.Infof("start get result")
+	err = s.getResult(ctx)
+	if err != nil {
+		return
+	}
 
 	//进行判题
+	s.logger.Infof("start judge")
 	ok := s.judge(ctx)
 
-	ch := make(chan struct{})
+	s.logger.Infof("start store judge result")
+	ch := make(chan error)
 	go func() {
 		//更新结果
-		s.storeJudgeResults(ok, ctx)
-		ch <- struct{}{}
+		err = s.storeJudgeResults(ok, ctx)
+		ch <- err
 		close(ch)
 	}()
 	//文件清理
-	s.removeFiles(ctx)
-	s.removeContainer(ctx.Config.ContainerId)
-	<-ch
+	s.logger.Infof("start remove generated files")
+	err = s.removeFiles(ctx)
+	err = s.removeContainer(ctx.Config.ContainerId)
+	err = <-ch
+	if err != nil {
+		return
+	}
 }
 
 func initJudgeContext(compileDir string) *entity.JudgeContext {
 	return &entity.JudgeContext{
 		Question: &entity.QuestionContext{
 			Answer:      []string{},
-			JudgeConfig: common.Config{},
+			JudgeConfig: &common.Config{},
 			JudgeCase:   []string{},
 		},
 		Config: &entity.ConfigContext{
@@ -212,8 +231,13 @@ func (s *judgeService) generateFiles(ctx *entity.JudgeContext) error {
 
 	//写入代码执行参数,使用分割段来区分多个输入执行的多个输出
 	for i := range ctx.Question.JudgeCase {
+		//多个判题用例分隔起始符
 		_, err = fd2.WriteString(fmt.Sprintf("echo '===%d START==='\n", i))
-		_, err = fd2.WriteString(fmt.Sprintf("%v %v\n", execCmd, ctx.Question.JudgeCase[i]))
+
+		//使用管道和echo命令将输入用例输入，使用 -e 选项来解释其中的转义字符
+		_, err = fd2.WriteString(fmt.Sprintf("echo -e \"%s\"| %v\n", ctx.Question.JudgeCase[i], execCmd))
+
+		//多个判题用例结束符
 		_, err = fd2.WriteString(fmt.Sprintf("echo '===%d END==='\n", i))
 		if err != nil {
 			return err
@@ -329,7 +353,7 @@ func (s *judgeService) normalJudge(ctx *entity.JudgeContext) bool {
 func (s *judgeService) aiSuggestion(ctx *entity.JudgeContext) error {
 	roleStr := "现在你是一位算法工程师，你将根据后面的题目的描述信息和实现代码，从时间复杂度和空间复杂度对代码做出评价，并给出代码的优化思路建议。对于接下来我给出的题目描述信息和题目实现代码，请严格按照如下格式给出回复(待优化代码和优化建议需要根据实际代码进行替换)：\n代码时间复杂度：xxx，空间复杂度：xxx。\n待优化代码：第x行到第x行：a=b;\n c = a;\n优化建议：c=b 直接将b赋值给c减少内存拷贝\n"
 	judgeCase, _ := json.Marshal(ctx.Question.JudgeCase)
-	msg := roleStr + "\n" + "题目标题：" + ctx.Question.Title + "\n" + "题目内容：" + ctx.Question.Content + "输入输出用例：" + string(judgeCase) + "\n" + "实现代码：" + ctx.Question.Code + "\n"
+	msg := roleStr + "\n" + "题目标题：" + ctx.Question.Title + "\n" + ctx.Question.Content + string(judgeCase) + "\n" + "实现代码：" + ctx.Question.Code + "\n"
 	s.ai.SendMessage(msg)
 	resp, err := s.ai.ReceiveMessage()
 	if err != nil {
@@ -383,9 +407,9 @@ func (s *judgeService) storeJudgeResults(ok bool, ctx *entity.JudgeContext) (err
 
 // 获取绝对路径
 func getDirAbsolutePath() string {
-	//TODO:测试文件中执行是测试文件的路径，main中执行是项目的路径
-	//relateDir := "public/submit_code"
-	relateDir := "../../public/submit_code"
+	relateDir := "public/submit_code"
+	//测试路径
+	//relateDir := "../../public/submit_code"
 	execDir, _ := os.Getwd()
 	return filepath.Join(execDir, relateDir)
 }
@@ -412,7 +436,7 @@ func generateFileName(ctx *entity.QuestionContext) (string, string, string) {
 func chooseExecCommand(lan string, filePath string, execPath string) (compileCmd string, execCmd string) {
 	switch lan {
 	case constant.GO_LANGUAGE:
-		compileCmd = fmt.Sprintf("go build  %v -o %v && chmod +x %v", filePath, execPath, execPath)
+		compileCmd = fmt.Sprintf("go build  -o %v %v && chmod +x %v", execPath, filePath, execPath)
 		execCmd = fmt.Sprintf("%v", execPath)
 
 	case constant.JAVA_LANGUAGE:
@@ -439,12 +463,13 @@ func chooseExecCommand(lan string, filePath string, execPath string) (compileCmd
 
 // 对docker的执行结果进行处理，去除不可见字符
 func resultLogProcedure(out string, length int) []string {
-	// 正则表达式去除所有不可见字符
-	reg, err := regexp.Compile(`[^\x20-\x7E\n]`)
-	if err != nil {
-		log.Fatalf("Error compiling regex: %v", err)
+	var res strings.Builder
+	for _, runeValue := range out {
+		if unicode.IsGraphic(runeValue) || runeValue == '\n' || runeValue == '\t' || runeValue == ' ' {
+			res.WriteRune(runeValue)
+		}
 	}
-	output := reg.ReplaceAllString(out, "")
+	output := res.String()
 
 	//解析输出结果，通过分割符将各个输出单独切割出来
 	var result []string
@@ -455,8 +480,9 @@ func resultLogProcedure(out string, length int) []string {
 		endIndex := bytes.Index([]byte(output), []byte(endMarker))
 		if startIndex != -1 && endIndex != -1 && endIndex > startIndex {
 			commandOutput := output[startIndex+len(startMarker) : endIndex]
-			result = append(result, commandOutput)
+			result = append(result, strings.TrimSuffix(commandOutput, "\n"))
 		}
 	}
+
 	return result
 }

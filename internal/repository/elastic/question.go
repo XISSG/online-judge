@@ -14,7 +14,7 @@ func (es *ESClient) GetQuestionById(queryId int) *response.Question {
 }
 
 func (es *ESClient) SearchQuestions(query string) []*response.Question {
-	return searchDocsByQuery[response.Question](es, constant.QUESTION_INDEX, query)
+	return searchDocsByQuery[response.Question](es, constant.QUESTION_INDEX, query, []string{"title", "content", "tags"})
 }
 
 func (es *ESClient) DeleteQuestionById(queryId int) error {

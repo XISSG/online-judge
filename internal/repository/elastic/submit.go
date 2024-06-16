@@ -14,7 +14,7 @@ func (es *ESClient) GetSubmitById(queryId int) *response.Submit {
 }
 
 func (es *ESClient) SearchSubmits(query string) []*response.Submit {
-	return searchDocsByQuery[response.Submit](es, constant.SUBMIT_INDEX, query)
+	return searchDocsByQuery[response.Submit](es, constant.SUBMIT_INDEX, query, []string{"title,content"})
 }
 
 func (es *ESClient) UpdateSubmit(submit *response.Submit) error {

@@ -56,7 +56,7 @@ func (s *aiService) ReceiveMessage() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	var res string
+	res := ""
 	for i := range messages {
 		if messages[i].Payload == nil {
 			continue

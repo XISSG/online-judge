@@ -20,7 +20,7 @@ type QuestionContext struct {
 	Status      string
 	JudgeResult string
 	JudgeCase   []string
-	JudgeConfig common.Config
+	JudgeConfig *common.Config
 }
 
 type ConfigContext struct {

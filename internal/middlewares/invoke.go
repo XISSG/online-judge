@@ -31,6 +31,6 @@ func InvokeCount() gin.HandlerFunc {
 
 		key := fmt.Sprintf("invoke:%s:%s", method, path)
 		rdb.HIncrBy(key, "count", 1)
-		rdb.HIncrBy(key, "invoke_time", duration.Milliseconds())
+		rdb.HIncrBy(key, "invoke_time_cost", duration.Milliseconds())
 	}
 }

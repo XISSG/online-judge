@@ -11,7 +11,7 @@ import (
 )
 
 func ConvertUserEntity(userRequest *request.User) *entity.User {
-	var userEntity *entity.User
+	userEntity := new(entity.User)
 
 	userEntity.ID = Snowflake()
 	userEntity.UserRole = constant.USER
@@ -26,7 +26,7 @@ func ConvertUserEntity(userRequest *request.User) *entity.User {
 }
 
 func ConvertUserResponse(userEntity *entity.User) *response.User {
-	var userResponse *response.User
+	userResponse := &response.User{}
 
 	userResponse.ID = userEntity.ID
 	userResponse.UserName = userEntity.UserName
@@ -38,9 +38,9 @@ func ConvertUserResponse(userEntity *entity.User) *response.User {
 }
 
 func ConvertQuestionEntity(questionRequest *request.Question, userId int) *entity.Question {
-	var questionEntity *entity.Question
+	questionEntity := &entity.Question{}
 
-	tag, err := json.Marshal(questionRequest.Tag)
+	tags, err := json.Marshal(questionRequest.Tags)
 	answer, err := json.Marshal(questionRequest.Answer)
 	judgeCase, err := json.Marshal(questionRequest.JudgeCase)
 	judgeConfig, err := json.Marshal(questionRequest.JudgeConfig)
@@ -53,7 +53,7 @@ func ConvertQuestionEntity(questionRequest *request.Question, userId int) *entit
 	questionEntity.SubmitNum = 0
 	questionEntity.UserId = userId
 	questionEntity.ID = Snowflake()
-	questionEntity.Tag = string(tag)
+	questionEntity.Tags = string(tags)
 	questionEntity.Answer = string(answer)
 	questionEntity.JudgeCase = string(judgeCase)
 	questionEntity.Title = questionRequest.Title
@@ -67,22 +67,42 @@ func ConvertQuestionEntity(questionRequest *request.Question, userId int) *entit
 }
 
 func ConvertQuestionResponse(questionEntity *entity.Question) *response.Question {
-	var tag []string
+	var err error
+	var tags []string
 	var answer []string
 	var judgeCase []string
-	var judgeConfig common.Config
-	var questionResponse *response.Question
+	var judgeConfig *common.Config
+	questionResponse := &response.Question{}
 
-	err := json.Unmarshal([]byte(questionEntity.Tag), &tag)
-	err = json.Unmarshal([]byte(questionEntity.Answer), &answer)
-	err = json.Unmarshal([]byte(questionEntity.JudgeCase), &judgeCase)
-	err = json.Unmarshal([]byte(questionEntity.JudgeConfig), &judgeConfig)
+	if questionEntity.Tags == "" {
+		tags = nil
+	} else {
+		err = json.Unmarshal([]byte(questionEntity.Tags), &tags)
+	}
+
+	if questionEntity.Answer == "" {
+		answer = nil
+	} else {
+		err = json.Unmarshal([]byte(questionEntity.Answer), &answer)
+	}
+
+	if questionEntity.JudgeCase == "" {
+		judgeCase = nil
+	} else {
+		err = json.Unmarshal([]byte(questionEntity.JudgeCase), &judgeCase)
+	}
+
+	if questionEntity.JudgeConfig == "" {
+		judgeConfig = nil
+	} else {
+		err = json.Unmarshal([]byte(questionEntity.JudgeConfig), &judgeConfig)
+	}
 
 	if err != nil {
 		return nil
 	}
 
-	questionResponse.Tag = tag
+	questionResponse.Tags = tags
 	questionResponse.Answer = answer
 	questionResponse.JudgeCase = judgeCase
 	questionResponse.ID = questionEntity.ID
@@ -99,11 +119,11 @@ func ConvertQuestionResponse(questionEntity *entity.Question) *response.Question
 }
 
 func UpdateQuestionToQuestionEntity(updateRequest *request.UpdateQuestion) *entity.Question {
-	var questionEntity *entity.Question
+	questionEntity := &entity.Question{}
 
 	if updateRequest.Tag != nil {
-		tag, _ := json.Marshal(updateRequest.Tag)
-		questionEntity.Tag = string(tag)
+		tags, _ := json.Marshal(updateRequest.Tag)
+		questionEntity.Tags = string(tags)
 	}
 
 	if updateRequest.Answer != nil {
@@ -124,13 +144,15 @@ func UpdateQuestionToQuestionEntity(updateRequest *request.UpdateQuestion) *enti
 	questionEntity.ID = updateRequest.ID
 	questionEntity.Title = updateRequest.Title
 	questionEntity.Content = updateRequest.Content
+	questionEntity.AcceptNum = updateRequest.AcceptNum
+	questionEntity.SubmitNum = updateRequest.SubmitNum
 	questionEntity.UpdateTime = time.Now().Format(time.RFC3339Nano)
 
 	return questionEntity
 }
 
 func ConvertSubmitEntity(submitRequest *request.Submit, userId int) *entity.Submit {
-	var submitEntity *entity.Submit
+	submitEntity := &entity.Submit{}
 
 	submitEntity.Status = constant.WATING_STATUS
 	submitEntity.UserId = userId
@@ -146,7 +168,7 @@ func ConvertSubmitEntity(submitRequest *request.Submit, userId int) *entity.Subm
 	return submitEntity
 }
 func ConvertSubmitResponse(submitEntity *entity.Submit) *response.Submit {
-	var submitResponse *response.Submit
+	submitResponse := &response.Submit{}
 
 	submitResponse.ID = submitEntity.ID
 	submitResponse.UserId = submitEntity.UserId
@@ -160,7 +182,7 @@ func ConvertSubmitResponse(submitEntity *entity.Submit) *response.Submit {
 }
 
 func UpdateSubmitToSubmitEntity(updateRequest *request.UpdateSubmit) *entity.Submit {
-	var submitEntity *entity.Submit
+	submitEntity := &entity.Submit{}
 
 	submitEntity.ID = updateRequest.ID
 	submitEntity.Status = updateRequest.Status

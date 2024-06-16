@@ -9,22 +9,18 @@ definitions:
       message:
         type: string
     type: object
-  request.Body:
-    properties:
-      data:
-        type: string
-      id:
-        maximum: 64
-        type: integer
-    required:
-    - id
-    type: object
   request.Invoke:
     properties:
       method:
+        enum:
+        - GET
+        - POST
         type: string
       path:
         type: string
+    required:
+    - method
+    - path
     type: object
   request.Login:
     properties:
@@ -46,7 +42,7 @@ definitions:
         type: string
       language:
         description: '"编程语言"'
-        maxLength: 64
+        maxLength: -9223372036854775808
         type: string
       question_id:
         description: '"判题id"'
@@ -73,7 +69,7 @@ definitions:
         maxLength: 1024
         type: string
       id:
-        maximum: 64
+        maximum: 10000000000000000000
         type: integer
       judge_case:
         description: '"判题用例json数组,输入用例"'
@@ -111,12 +107,17 @@ definitions:
   request.UpdateUser:
     properties:
       data:
-        $ref: '#/definitions/request.Body'
+        type: string
+      id:
+        maximum: 10000000000000000000
+        type: integer
       type:
         enum:
         - password
         - avatar
         type: string
+    required:
+    - id
     type: object
   request.User:
     properties:
@@ -135,157 +136,6 @@ definitions:
 info:
   contact: {}
 paths:
-  /admin/create_question:
-    post:
-      consumes:
-      - application/json
-      description: Create question
-      parameters:
-      - description: create question
-        in: body
-        name: createRequest
-        required: true
-        schema:
-          $ref: '#/definitions/request.Question'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-        "400":
-          description: bad request
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-      summary: Create question
-      tags:
-      - question
-  /admin/delete_question:
-    get:
-      consumes:
-      - application/json
-      description: Delete question
-      parameters:
-      - description: delete question
-        in: query
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-        "400":
-          description: bad request
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-      summary: Delete question
-      tags:
-      - question
-  /admin/delete_submit:
-    get:
-      consumes:
-      - application/json
-      description: Delete submit
-      parameters:
-      - description: delete submit
-        in: query
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-        "400":
-          description: bad request
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-      summary: Delete submit
-      tags:
-      - submit
-  /admin/delete_user:
-    get:
-      consumes:
-      - application/json
-      description: User registration
-      parameters:
-      - description: delete user by id
-        in: query
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-        "400":
-          description: bad request
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-      summary: User registration
-      tags:
-      - user
-  /admin/get_users:
-    get:
-      consumes:
-      - application/json
-      description: Get user list
-      parameters:
-      - description: get user list by id
-        in: query
-        name: id
-        required: true
-        type: string
-      - description: get user list by name
-        in: query
-        name: name
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-        "400":
-          description: bad request
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-      summary: Get user list
-      tags:
-      - user
   /admin/invoke/count:
     post:
       consumes:
@@ -316,7 +166,66 @@ paths:
       summary: get api invoke count
       tags:
       - invoke
-  /admin/update_question:
+  /admin/question/create_question:
+    post:
+      consumes:
+      - application/json
+      description: Create question
+      parameters:
+      - description: create question
+        in: body
+        name: createRequest
+        required: true
+        schema:
+          $ref: '#/definitions/request.Question'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+      summary: Create question
+      tags:
+      - question
+  /admin/question/delete_question:
+    get:
+      consumes:
+      - application/json
+      description: Delete question
+      parameters:
+      - description: delete question
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+      summary: Delete question
+      tags:
+      - question
+  /admin/question/update_question:
     post:
       consumes:
       - application/json
@@ -346,7 +255,126 @@ paths:
       summary: Update question
       tags:
       - question
-  /admin/update_user:
+  /admin/submit/delete_submit:
+    get:
+      consumes:
+      - application/json
+      description: Delete submit
+      parameters:
+      - description: delete submit
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+      summary: Delete submit
+      tags:
+      - submit
+  /admin/user/ban_user:
+    get:
+      consumes:
+      - application/json
+      description: User registration
+      parameters:
+      - description: ban user by id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+      summary: User registration
+      tags:
+      - user
+  /admin/user/delete_user:
+    get:
+      consumes:
+      - application/json
+      description: User registration
+      parameters:
+      - description: delete user by id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+      summary: User registration
+      tags:
+      - user
+  /admin/user/get_users:
+    get:
+      consumes:
+      - application/json
+      description: Get user list
+      parameters:
+      - description: get user list by id
+        in: query
+        name: id
+        type: string
+      - description: get user list by name
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+      summary: Get user list
+      tags:
+      - user
+  /admin/user/update_user:
     post:
       consumes:
       - application/json
@@ -376,7 +404,60 @@ paths:
       summary: Update user
       tags:
       - user
-  /question/get_questions:
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: User Login
+      parameters:
+      - description: user Login
+        in: body
+        name: loginRequest
+        required: true
+        schema:
+          $ref: '#/definitions/request.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+      summary: User Login
+      tags:
+      - user
+  /user/picture/avatar:
+    get:
+      consumes:
+      - application/json
+      description: Get random picture
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+      summary: Get random picture
+      tags:
+      - picture
+  /user/question/get_questions:
     get:
       consumes:
       - application/json
@@ -410,7 +491,7 @@ paths:
       summary: get question list
       tags:
       - question
-  /question/search_questions:
+  /user/question/search_questions:
     get:
       consumes:
       - application/json
@@ -439,7 +520,37 @@ paths:
       summary: Search question
       tags:
       - question
-  /submit/create_submit:
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: User registration
+      parameters:
+      - description: create user
+        in: body
+        name: createRequest
+        required: true
+        schema:
+          $ref: '#/definitions/request.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/middlewares.Response'
+      summary: User registration
+      tags:
+      - user
+  /user/submit/create_submit:
     post:
       consumes:
       - application/json
@@ -469,7 +580,7 @@ paths:
       summary: Create submit
       tags:
       - submit
-  /submit/get_submits:
+  /user/submit/get_submits:
     get:
       consumes:
       - application/json
@@ -503,7 +614,7 @@ paths:
       summary: get submit list
       tags:
       - submit
-  /submit/search_submits:
+  /user/submit/search_submits:
     get:
       consumes:
       - application/json
@@ -532,64 +643,4 @@ paths:
       summary: Search submit
       tags:
       - submit
-  /user/login:
-    post:
-      consumes:
-      - application/json
-      description: User login
-      parameters:
-      - description: user login
-        in: body
-        name: loginRequest
-        required: true
-        schema:
-          $ref: '#/definitions/request.Login'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-        "400":
-          description: bad request
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-      summary: User login
-      tags:
-      - user
-  /user/register:
-    post:
-      consumes:
-      - application/json
-      description: User registration
-      parameters:
-      - description: create user
-        in: body
-        name: createRequest
-        required: true
-        schema:
-          $ref: '#/definitions/request.User'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-        "400":
-          description: bad request
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/middlewares.Response'
-      summary: User registration
-      tags:
-      - user
 swagger: "2.0"

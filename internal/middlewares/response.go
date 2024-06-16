@@ -46,12 +46,13 @@ func ResponseMiddleware(logger *zap.SugaredLogger) gin.HandlerFunc {
 
 		defer logger.Sync()
 		// 处理请求后的响应
-		if c.Writer.Status() != http.StatusOK {
-			// 如果状态码不是 200，返回错误响应
-			c.JSON(c.Writer.Status(), ErrorResponse(c.Writer.Status(), c.Errors.ByType(gin.ErrorTypePrivate).String()))
-		} else {
-			// 返回成功响应
-			c.JSON(http.StatusOK, SuccessResponse(c.Keys["data"]))
+		if c.Writer.Status() == http.StatusOK {
+			if filePath, exists := c.Get("file"); exists {
+				c.File(filePath.(string))
+				// 返回成功响应
+			} else {
+				c.JSON(http.StatusOK, SuccessResponse(c.Keys["data"]))
+			}
 		}
 	}
 }

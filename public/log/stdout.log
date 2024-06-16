@@ -4,3 +4,94 @@
 {"level":"error","time":"2024-06-13T13:23:56+08:00","message":"Error msg"}
 {"level":"info","time":"2024-06-13T13:25:52+08:00","message":"Info msg"}
 {"level":"error","time":"2024-06-13T13:25:52+08:00","message":"Error msg"}
+{"level":"error","time":"2024-06-14T23:13:18+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:13:23+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:15:38+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:22:18+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:22:28+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:22:40+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:23:22+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:23:23+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:27:03+08:00","message":"Register user name is already exist"}
+{"level":"error","time":"2024-06-14T23:27:54+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:29:06+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:29:40+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:29:55+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:30:26+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:31:06+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:32:52+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:50:14+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:51:18+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:51:45+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:51:52+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:52:12+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:52:14+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:52:15+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:53:59+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:54:41+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:55:28+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:58:34+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-14T23:59:33+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-15T00:00:02+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-15T00:00:16+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-15T00:00:55+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-15T00:01:22+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"info","time":"2024-06-15T01:01:24+08:00","message":"user authentication failed"}
+{"level":"info","time":"2024-06-15T01:02:40+08:00","message":"user authentication failed"}
+{"level":"info","time":"2024-06-15T01:05:09+08:00","message":"user authentication failed"}
+{"level":"error","time":"2024-06-15T12:04:46+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-15T12:05:18+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-15T12:06:10+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-15T12:08:49+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-15T12:09:32+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-15T12:11:13+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"error","time":"2024-06-15T12:12:08+08:00","message":"runtime error: invalid memory address or nil pointer dereference"}
+{"level":"info","time":"2024-06-15T12:13:38+08:00","message":"admin user authentication failed"}
+{"level":"info","time":"2024-06-15T12:14:57+08:00","message":"admin user authentication failed"}
+{"level":"info","time":"2024-06-15T12:21:42+08:00","message":"admin user authentication failed"}
+{"level":"info","time":"2024-06-15T12:25:30+08:00","message":"admin user authentication failed"}
+{"level":"info","time":"2024-06-15T12:29:50+08:00","message":"admin user authentication failed"}
+{"level":"info","time":"2024-06-15T12:38:35+08:00","message":"admin user authentication failed"}
+{"level":"info","time":"2024-06-15T13:01:36+08:00","message":"admin user authentication failed"}
+{"level":"info","time":"2024-06-15T13:30:49+08:00","message":"admin user authentication failed"}
+{"level":"info","time":"2024-06-15T13:31:01+08:00","message":"admin user authentication failed"}
+{"level":"error","time":"2024-06-15T13:34:03+08:00","message":"Bad field type common.Config"}
+{"level":"error","time":"2024-06-15T13:35:45+08:00","message":"Bad field type common.Config"}
+{"level":"error","time":"2024-06-15T13:37:08+08:00","message":"Bad field type common.Config"}
+{"level":"info","time":"2024-06-15T13:57:42+08:00","message":"user authentication failed"}
+{"level":"info","time":"2024-06-15T13:57:47+08:00","message":"user authentication failed"}
+{"level":"info","time":"2024-06-15T13:58:04+08:00","message":"invalid question page or page size"}
+{"level":"info","time":"2024-06-15T14:00:16+08:00","message":"user authentication failed"}
+{"level":"info","time":"2024-06-15T14:04:55+08:00","message":"admin user authentication failed"}
+{"level":"info","time":"2024-06-15T14:08:13+08:00","message":"admin user authentication failed"}
+{"level":"error","time":"2024-06-15T14:08:48+08:00","message":"strconv.ParseInt: parsing \"9999999999999999999\": value out of range"}
+{"level":"error","time":"2024-06-15T14:09:05+08:00","message":"strconv.ParseInt: parsing \"9999999999999999999\": value out of range"}
+{"level":"error","time":"2024-06-15T14:09:30+08:00","message":"strconv.ParseInt: parsing \"9999999999999999999\": value out of range"}
+{"level":"info","time":"2024-06-15T14:13:02+08:00","message":"question validate error Key: 'UpdateQuestion.JudgeConfig' Error:Field validation for 'JudgeConfig' failed on the 'max' tag"}
+{"level":"info","time":"2024-06-15T14:32:37+08:00","message":"admin user authentication failed"}
+{"level":"info","time":"2024-06-15T14:45:47+08:00","message":"submit validate error Key: 'Submit.QuestionId' Error:Field validation for 'QuestionId' failed on the 'max' tag"}
+{"level":"info","time":"2024-06-15T14:49:35+08:00","message":"submit create error status: 400, failed: [mapper_parsing_exception], reason: failed to parse field [id] of type [integer] in document with id '1801869292526899200'. Preview of field's value: '1801869292526899200'"}
+{"level":"info","time":"2024-06-15T14:52:37+08:00","message":"submit create error status: 400, failed: [mapper_parsing_exception], reason: failed to parse field [id] of type [integer] in document with id '1801869959727419392'. Preview of field's value: '1801869959727419392'"}
+{"level":"info","time":"2024-06-15T14:59:57+08:00","message":"submit publish error Exception (504) Reason: \"channel/connection is not open\""}
+{"level":"info","time":"2024-06-15T15:02:30+08:00","message":"submit publish error Exception (504) Reason: \"channel/connection is not open\""}
+{"level":"info","time":"2024-06-15T17:18:25+08:00","message":"question request error invalid character ']' looking for beginning of value"}
+{"level":"info","time":"2024-06-15T17:18:37+08:00","message":"question request error invalid character ']' looking for beginning of value"}
+{"level":"info","time":"2024-06-15T17:19:29+08:00","message":"question request error invalid character ']' looking for beginning of value"}
+{"level":"info","time":"2024-06-15T17:25:06+08:00","message":"submit request error invalid character '\"' after object key:value pair"}
+{"level":"info","time":"2024-06-15T17:25:11+08:00","message":"submit request error invalid character '\"' after object key:value pair"}
+{"level":"info","time":"2024-06-15T19:41:07+08:00","message":"user authentication failed"}
+{"level":"info","time":"2024-06-15T19:41:27+08:00","message":"invalid submit page or page size"}
+{"level":"info","time":"2024-06-15T19:42:42+08:00","message":"user authentication failed"}
+{"level":"info","time":"2024-06-15T19:43:41+08:00","message":"admin user authentication failed"}
+{"level":"info","time":"2024-06-15T19:43:47+08:00","message":"admin user authentication failed"}
+{"level":"info","time":"2024-06-16T13:05:12+08:00","message":"question validate error Key: 'Question.Title' Error:Field validation for 'Title' failed on the 'max' tag"}
+{"level":"info","time":"2024-06-16T13:05:42+08:00","message":"question validate error Key: 'Question.Title' Error:Field validation for 'Title' failed on the 'max' tag"}
+{"level":"info","time":"2024-06-16T13:06:13+08:00","message":"question validate error Key: 'Question.Title' Error:Field validation for 'Title' failed on the 'max' tag"}
+{"level":"info","time":"2024-06-16T13:08:50+08:00","message":"question validate error Key: 'Question.Title' Error:Field validation for 'Title' failed on the 'max' tag"}
+{"level":"info","time":"2024-06-16T13:38:41+08:00","message":"user authentication failed"}
+{"level":"info","time":"2024-06-16T13:41:31+08:00","message":"user authentication failed"}
+{"level":"error","time":"2024-06-16T13:58:10+08:00","message":"search question error not found query question"}
+{"level":"error","time":"2024-06-16T13:59:08+08:00","message":"search question error not found query question"}
+{"level":"error","time":"2024-06-16T13:59:54+08:00","message":"search question error not found query question"}
+{"level":"error","time":"2024-06-16T14:08:02+08:00","message":"search question error not found query question"}
+{"level":"error","time":"2024-06-16T14:50:04+08:00","message":"search question error not found query question"}

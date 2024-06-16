@@ -19,7 +19,7 @@ PUT /question/
         "type": "text",
         "analyzer": "ik_max_word"
       },
-      "tag": {
+      "tags": {
         "type": "text",
         "analyzer": "ik_smart"
       },

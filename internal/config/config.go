@@ -16,6 +16,7 @@ type Config struct {
 	AI            AIConfig
 	Log           LogConfig
 	Jwt           JWTConfig
+	Picture       PictureConfig
 }
 
 type ElasticsearchConfig struct {
@@ -78,6 +79,10 @@ type LogConfig struct {
 type JWTConfig struct {
 	Secret     string        `mapstructure:"secret"`
 	Expiration time.Duration `mapstructure:"expiration"`
+}
+
+type PictureConfig struct {
+	Path string `mapstructure:"path"`
 }
 
 func LoadConfig() Config {

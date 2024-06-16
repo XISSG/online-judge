@@ -1,0 +1,259 @@
+POST http://localhost:8082/user/login
+Content-Type: application/json
+
+{
+  "user_name": "xissg",
+  "user_password": "0709"
+}
+
+###
+
+POST http://localhost:8082/admin/question/create_question
+accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNlQyMzowNTo0Ny43ODY0NDQyNTMrMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.QzIKz8gi9sXckOMSkwubryzdvcNtQZn-vwyZbfPMptc
+
+{
+  "title": "You are given a tree with n nodes (numbered from 1 to n). The root is node 1. Each edge in this tree has a particular color which is specified by an integer from 1 to 1 0 8 10^810 \n8\n . We define a path on the tree as a gift path if and only if adjacent edges on the path have different colors. In addition, we define a node as a gift node, if all the paths starting at this node are gift paths.\nWe have Q questions for you. For each question, you are given a node R, and you need to find out the number of gift nodes in the subtree of node R. Note that when we say a node in some subtree is a gift node, only paths in that subtree will be considered.",
+  "content": "Input\nFirst line contains an integer n (1 ≤ n ≤ 200000) .\nEach of the next n − 1 lines contains three integers A i A_iA \ni\n​\n , B i B_iB \ni\n​\n , C i C_iC \ni\n​\n  (1 ≤ A i A_iA \ni\n​\n , B i B_iB \ni\n​\n , C i C_iC \ni\n​\n  ≤ n, A i A_iA \ni\n​\n , ≠ B i B_iB \ni\n​\n ) , represents an edge of color C i C_iC \ni\n​\n  that connects nodes A i A_iA \ni\n​\n  and B i B_iB \ni\n​\n .\nThen there will be a line which contains a single integer Q (1 ≤ Q ≤ 10000) , represents the number of questions.\nEach of the next Q lines contains a single integer R i R_iR \ni\n​\n  (1 ≤ R i R_iR \ni\n​\n  ≤ n) , we want to know the number of gift nodes in the subtree where the root is R i R_iR \ni\n​\n . Output\nPrint Q lines, each line contains a single integer S i S_iS \ni\n​\n , represents\nthe answer for question i.",
+  "tag": [
+    "图"
+  ],
+  "judge_case": [
+    "8\n1 3 1\n2 3 1\n3 4 3\n4 5 4\n5 6 3\n6 7 2\n6 8 2\n2\n1\n5"
+  ],
+  "answer": [
+    "4\n2"
+  ],
+  "judge_config": {
+    "time_limit": 1000,
+    "memory_limit": 512
+  }
+}
+
+###
+POST http://localhost:8082/admin/question/create_question
+accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNlQyMjo1MjowMS45MzkzNTY1MjIrMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.J6g9kOqXNj5JS89ICUwDYFZ1DtiNi2aS5roOaemfDqU
+
+{
+  "title":
+  "Luna wants to play a boring game.\nShe has three integers a, b, c in the beginning.\nShe will play the game k rounds.\nEach round she will do exactly 3 steps in order:\n　　1. If a > b then a = a − b.\n　　2. If b > c then b = b − c.\n　　3. If c > a then c = c − a.\nShe wants you to help her calculate a, b, c after k rounds."
+,
+  "content":
+  "Input\nFirst line contains an integer T (1 ≤ T ≤ 10) represents the number of test cases.\nFor each test case:\nOne line contains four integers a, b, c, k (1 ≤ a, b, c ≤ 1 0 6 10^610 \n6\n , 1 ≤ k ≤ 1 0 9 10^910 \n9\n ) represents the integers in the beginning and the rounds of the game. Output\nFor each test case, output a line contains three integers represents the integers a, b, c after k rounds."
+,
+  "tag": [
+    "数组"
+  ],
+  "judge_case": [
+    "2\n1 10 100 2\n100 10 1 2"
+  ],
+  "answer": [
+    "1 10 98\n81 8 1"
+  ],
+  "judge_config": {
+    "time_limit": 1000,
+    "memory_limit": 512
+  }
+}
+
+###
+POST http://localhost:8082/admin/question/create_question
+accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNlQyMjo1MjowMS45MzkzNTY1MjIrMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.J6g9kOqXNj5JS89ICUwDYFZ1DtiNi2aS5roOaemfDqU
+
+{
+  "title": "",
+  "content": "",
+  "tag": [],
+  "judge_case": [],
+  "answer": [],
+  "judge_config": {
+    "time_limit": 1000,
+    "memory_limit": 512
+  }
+}
+###
+POST http://localhost:8082/admin/question/create_question
+accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNlQyMjo1MjowMS45MzkzNTY1MjIrMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.J6g9kOqXNj5JS89ICUwDYFZ1DtiNi2aS5roOaemfDqU
+
+{
+  "title":
+  "The Stick Kingdom will start a war to the Hammer Kingdom! The power of the stick army is the number of 1 ∗ 1 grids made up of sticks. The king of Stick Kingdom would give you the grids he needed, and you should tell him the minimum number of sticks he needed.\nNote: it’s very difficult for sticks to stand up, so the grids must be made on a 2-D plane."
+,
+  "content":
+  "Input\nFirst line contains an integer T (1 ≤ T ≤ 10v) represents the number of test cases.\nFor each test case:\nThe first line contains an integer n (1 ≤ n ≤ 1 0 6 10^610 \n6\n ) represents the number of grids the king needed.\n　\nOutput\nFor each test case, output a line contains an integer represents the minimum number of sticks the king needed."
+,
+  "tag": ["图"],
+  "judge_case": [
+    "4\n1\n2\n3\n4"
+  ],
+  "answer": [
+    "4\n7\n10\n12"
+  ],
+  "judge_config": {
+    "time_limit": 1000,
+    "memory_limit": 512
+  }
+}
+
+###
+POST http://localhost:8082/admin/question/create_question
+accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNlQyMjo1MjowMS45MzkzNTY1MjIrMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.J6g9kOqXNj5JS89ICUwDYFZ1DtiNi2aS5roOaemfDqU
+
+{
+  "title":
+  "A light comes from point s, passed from point e, and finally go to infinite far.\nThere is a light given by its s and e.\nYou’re given a point, and your task is to judge if the point is on this light."
+,
+  "content":
+  "Input\nFirst line contains an integer T (1 ≤ T ≤ 10v) represents the number of test cases.\nFor each test case:\nThe first line contains four integers sx, sy, ex, ey of the light.\nThe second line contains two integers px, py of the point.\n(1 ≤ sx, sy, ex, ey, px, py ≤ 1000 and (sx, sy) ! = (ex, ey)).\n　\nOutput\nFor each test case, if the point is on the light, output “YES” in a single line; otherwise, output “NO” in a single line."
+,
+  "tag": ["向量"],
+  "judge_case": [
+    "4\n2 2 3 3\n2 2\n2 2 3 3\n1 1\n7 7 11 10\n855 643\n7 7 7 8\n7 9"
+  ],
+  "answer": [
+    "YES\nNO\nYES\nYES"
+  ],
+  "judge_config": {
+    "time_limit": 1000,
+    "memory_limit": 512
+  }
+}
+
+###
+POST http://localhost:8082/admin/question/create_question
+accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNlQyMjo1MjowMS45MzkzNTY1MjIrMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.J6g9kOqXNj5JS89ICUwDYFZ1DtiNi2aS5roOaemfDqU
+
+{
+  "title":
+  "iG is the most powerful team in the game League of Legends. Now you’re given a string only contains lowercase or uppercase letters, you should convert all “ig”, “IG” and “Ig” including in the string to “iG”.\n"
+,
+  "content":
+  "Input\nOnly one line contains a string S (1 ≤ |S| ≤ 100,000) , S only contains lowercase or uppercase letters.\n　\nOutput\nOutput a string represents the answer."
+,
+  "tag": ["字符串"],
+  "judge_case": [
+    "GGIGismostpowerfulignbIgignbnb"
+  ],
+  "answer": [
+    "GGiGismostpowerfuliGnbiGiGnbnb"
+  ],
+  "judge_config": {
+    "time_limit": 1000,
+    "memory_limit": 512
+  }
+}
+
+###
+POST http://localhost:8082/admin/question/create_question
+accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNlQyMjo1MjowMS45MzkzNTY1MjIrMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.J6g9kOqXNj5JS89ICUwDYFZ1DtiNi2aS5roOaemfDqU
+
+{
+  "title":
+  "Please calculate ⌊ cos ⁡ 2 ( ( n − 1 ) ! + 1 n π ) ⌋ ⌊\\cos^2{(\\frac{(n-1)!+1}{n}}π)⌋⌊cos \n2\n ( \nn\n(n−1)!+1\n​\n π)⌋"
+,
+  "content":
+  "Input\nFirst line contains an integer T (1 ≤ T ≤ 1 0 3 10^310 \n3\n ) represents the number of test cases.\nFor each test case:\nThe first line contains an integer n (2 ≤ n ≤ 1 0 9 10^910 \n9\n ) represents the number of grids the king needed.\n　\nOutput\nFor each test case, output a line contains an integer represents the answer."
+,
+  "tag": ["公式计算","威尔逊定理"],
+  "judge_case": [
+    "3\n3\n4\n5"
+  ],
+  "answer": [
+    "1\n0\n1\n"
+  ],
+  "judge_config": {
+    "time_limit": 1000,
+    "memory_limit": 512
+  }
+}
+###
+POST http://localhost:8082/admin/question/create_question
+accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNlQyMjo1MjowMS45MzkzNTY1MjIrMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.J6g9kOqXNj5JS89ICUwDYFZ1DtiNi2aS5roOaemfDqU
+
+{
+  "title":
+  "若一个数（首位不为零）从左向右读与从右向左读都一样，我们就将其称之为回文数。\n\n例如：给定一个十进制数 \n56\n56，将 \n56\n56 加 \n65\n65（即把 \n56\n56 从右向左读），得到 \n121\n121 是一个回文数。\n\n又如：对于十进制数 \n87\n87：\n\nSTEP1：\n87\n+\n78\n=\n165\n87+78=165\nSTEP2：\n165\n+\n561\n=\n726\n165+561=726\nSTEP3：\n726\n+\n627\n=\n1353\n726+627=1353\nSTEP4：\n1353\n+\n3531\n=\n4884\n1353+3531=4884\n\n在这里的一步是指进行了一次 \n𝑁\nN 进制的加法，上例最少用了 \n4\n4 步得到回文数 \n4884\n4884。\n\n写一个程序，给定一个 \n𝑁\nN（\n2\n≤\n𝑁\n≤\n10\n2≤N≤10 或 \n𝑁\n=\n16\nN=16）进制数 \n𝑀\nM（\n100\n100 位之内），求最少经过几步可以得到回文数。如果在 \n30\n30 步以内（包含 \n30\n30 步）不可能得到回文数，则输出 Impossible!。"
+,
+  "content":
+  "输入格式\n两行，分别是 \n𝑁\nN，\n𝑀\nM。\n\n输出格式\n如果能在 \n30\n30 步以内得到回文数，输出格式形如 STEP=ans，其中 \nans\nans 为最少得到回文数的步数。\n\n否则输出 Impossible!。"
+,
+  "tag": [],
+  "judge_case": [
+    "10\n87"
+  ],
+  "answer": [
+    "STEP=4"
+  ],
+  "judge_config": {
+    "time_limit": 1000,
+    "memory_limit": 512
+  }
+}
+###
+POST http://localhost:8082/admin/question/create_question
+accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNlQyMjo1MjowMS45MzkzNTY1MjIrMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.J6g9kOqXNj5JS89ICUwDYFZ1DtiNi2aS5roOaemfDqU
+
+{
+  "title":
+  "为了准备一个独特的颁奖典礼，组织者在会场的一片矩形区域（可看做是平面直角坐标系的第一象限）铺上一些矩形地毯。一共有 \n𝑛\nn 张地毯，编号从 \n1\n1 到 \n𝑛\nn。现在将这些地毯按照编号从小到大的顺序平行于坐标轴先后铺设，后铺的地毯覆盖在前面已经铺好的地毯之上。\n\n地毯铺设完成后，组织者想知道覆盖地面某个点的最上面的那张地毯的编号。注意：在矩形地毯边界和四个顶点上的点也算被地毯覆盖。"
+,
+  "content":
+  "输入格式\n输入共 \n𝑛\n+\n2\nn+2 行。\n\n第一行，一个整数 \n𝑛\nn，表示总共有 \n𝑛\nn 张地毯。\n\n接下来的 \n𝑛\nn 行中，第 \n𝑖\n+\n1\ni+1 行表示编号 \n𝑖\ni 的地毯的信息，包含四个整数 \n𝑎\n,\n𝑏\n,\n𝑔\n,\n𝑘\na,b,g,k，每两个整数之间用一个空格隔开，分别表示铺设地毯的左下角的坐标 \n(\n𝑎\n,\n𝑏\n)\n(a,b) 以及地毯在 \n𝑥\nx 轴和 \n𝑦\ny 轴方向的长度。\n\n第 \n𝑛\n+\n2\nn+2 行包含两个整数 \n𝑥\nx 和 \n𝑦\ny，表示所求的地面的点的坐标 \n(\n𝑥\n,\n𝑦\n)\n(x,y)。\n\n输出格式\n输出共 \n1\n1 行，一个整数，表示所求的地毯的编号；若此处没有被地毯覆盖则输出 -1。"
+,
+  "tag": ["矩阵"],
+  "judge_case": [
+    "3\n1 0 2 3\n0 2 3 3\n2 1 3 3\n2 2"
+    "3\n1 0 2 3\n0 2 3 3\n2 1 3 3\n4 5"
+  ],
+  "answer": [
+    "3",
+    "-1"
+  ],
+  "judge_config": {
+    "time_limit": 1000,
+    "memory_limit": 512
+  }
+}
+
+###
+POST http://localhost:8082/admin/question/create_question
+accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNlQyMjo1MjowMS45MzkzNTY1MjIrMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.J6g9kOqXNj5JS89ICUwDYFZ1DtiNi2aS5roOaemfDqU
+
+{
+  "title":
+  "帅帅经常跟同学玩一个矩阵取数游戏：对于一个给定的 \n𝑛\n×\n𝑚\nn×m 的矩阵，矩阵中的每个元素 \n𝑎\n𝑖\n,\n𝑗\na \ni,j\n​\n  均为非负整数。游戏规则如下：\n\n每次取数时须从每行各取走一个元素，共 \n𝑛\nn 个。经过 \n𝑚\nm 次后取完矩阵内所有元素；\n每次取走的各个元素只能是该元素所在行的行首或行尾；\n每次取数都有一个得分值，为每行取数的得分之和，每行取数的得分 = 被取走的元素值 \n×\n2\n𝑖\n×2 \ni\n ，其中 \n𝑖\ni 表示第 \n𝑖\ni 次取数（从 \n1\n1 开始编号）；\n游戏结束总得分为 \n𝑚\nm 次取数得分之和。\n帅帅想请你帮忙写一个程序，对于任意矩阵，可以求出取数后的最大得分。"
+,
+  "content":
+  "输入格式\n输入文件包括 \n𝑛\n+\n1\nn+1 行：\n\n第一行为两个用空格隔开的整数 \n𝑛\nn 和 \n𝑚\nm。\n\n第 \n2\n∼\n𝑛\n+\n1\n2∼n+1 行为 \n𝑛\n×\n𝑚\nn×m 矩阵，其中每行有 \n𝑚\nm 个用单个空格隔开的非负整数。\n\n输出格式\n输出文件仅包含 \n1\n1 行，为一个整数，即输入矩阵取数后的最大得分。"
+,
+  "tag": ["矩阵"],
+  "judge_case": [
+    "2 3\n1 2 3\n3 4 2"
+  ],
+  "answer": [
+    "82"
+  ],
+  "judge_config": {
+    "time_limit": 1000,
+    "memory_limit": 512
+  }
+}
