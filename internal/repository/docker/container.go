@@ -51,6 +51,7 @@ func (docker *DockerClient) ContainerWait(containerId string) (chanResponse <-ch
 	ctx := context.Background()
 	return docker.client.ContainerWait(ctx, containerId, container.WaitConditionNotRunning)
 }
+
 func (docker *DockerClient) ContainerStart(containerId string) error {
 	ctx := context.Background()
 	options := container.StartOptions{}
@@ -66,10 +67,12 @@ func (docker *DockerClient) ContainerInspect(containerId string) (int, int64) {
 	}
 
 	exitCode := res.State.ExitCode
+
 	start := res.State.StartedAt
 	startTime, err := time.Parse(time.RFC3339, start)
 	finish := res.State.FinishedAt
 	endTime, err := time.Parse(time.RFC3339, finish)
+
 	execTime := endTime.Sub(startTime).Milliseconds()
 	return exitCode, execTime
 }
@@ -106,6 +109,7 @@ func (docker *DockerClient) ContainerStats(containerId string) (uint64, error) {
 	if err != nil {
 		return 0, err
 	}
+	defer res.Body.Close()
 	var data types.StatsJSON
 	err = json.NewDecoder(res.Body).Decode(&data)
 	return data.MemoryStats.Usage, err
@@ -121,4 +125,13 @@ func (docker *DockerClient) ContainerRemove(containerId string) error {
 	ctx := context.Background()
 	options := container.RemoveOptions{}
 	return docker.client.ContainerRemove(ctx, containerId, options)
+}
+
+func (docker *DockerClient) IsContainerRunning(containerId string) (bool, error) {
+	ctx := context.Background()
+	res, err := docker.client.ContainerInspect(ctx, containerId)
+	if err != nil {
+		return false, err
+	}
+	return res.State.Running, nil
 }

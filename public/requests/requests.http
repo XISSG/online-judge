@@ -3,7 +3,7 @@
 #  -H 'accept: application/json'
 GET http://localhost:8082/user/picture/avatar
 accept: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNlQyMjo1MjowMS45MzkzNTY1MjIrMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.J6g9kOqXNj5JS89ICUwDYFZ1DtiNi2aS5roOaemfDqU
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmF0aW9uIjoiMjAyNC0wNi0xNVQyMzozMjozOS45NTg0NzQwMTErMDg6MDAiLCJpZCI6MTgwMTgyMjgwNjczNjkwMDA5NiwidXNlcl9yb2xlIjoiYWRtaW4ifQ.OJrWWyQJr9UTKdeMGj3gNz3yXbOeflb5zfpy_bXSr7o
 
 ###
 

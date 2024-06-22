@@ -1,4 +1,4 @@
-package scheduler
+package spider
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 
 func TestSpider(t *testing.T) {
 	curPath, _ := os.Getwd()
-	path := filepath.Join(curPath, "../../public/pictures/avatar")
+	path := filepath.Join(curPath, "../../../public/pictures/avatar")
 	start := time.Now()
 	//for i := 1; i < 30; i++ {
 	//	Crawl(i, path)

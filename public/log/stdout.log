@@ -95,3 +95,6 @@
 {"level":"error","time":"2024-06-16T13:59:54+08:00","message":"search question error not found query question"}
 {"level":"error","time":"2024-06-16T14:08:02+08:00","message":"search question error not found query question"}
 {"level":"error","time":"2024-06-16T14:50:04+08:00","message":"search question error not found query question"}
+{"level":"info","time":"2024-06-16T16:36:53+08:00","message":"user authentication failed"}
+{"level":"info","time":"2024-06-16T16:37:16+08:00","message":"user authentication failed"}
+{"level":"info","time":"2024-06-16T16:37:21+08:00","message":"user authentication failed"}

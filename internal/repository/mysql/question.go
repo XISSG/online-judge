@@ -36,3 +36,11 @@ func (mysql *MysqlClient) DeleteQuestion(questionId int) error {
 	}
 	return nil
 }
+
+func (mysql *MysqlClient) GetRecentQuestion(lastUpdateTime string) []*entity.Question {
+	questionList, err := getRecentData[entity.Question](mysql, constant.QUESTION_TABLE, lastUpdateTime)
+	if err != nil {
+		return nil
+	}
+	return questionList
+}

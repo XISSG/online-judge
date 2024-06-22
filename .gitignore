@@ -103,6 +103,5 @@ fabric.properties
 
 vendor
 
-config/config.yaml
-
+internal/config/config.yaml
 public/pictures

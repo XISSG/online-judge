@@ -12,7 +12,7 @@ type Config struct {
 	Redis         RedisConfig
 	RabbitMQ      RabbitMQConfig
 	Server        ServerConfig
-	Image         ImageConfig
+	Images        ImageConfig
 	AI            AIConfig
 	Log           LogConfig
 	Jwt           JWTConfig
@@ -60,13 +60,28 @@ type ServerConfig struct {
 	Port int    `mapstructure:"port"`
 }
 
+// AIConfig
+//
+// Spark3.5 Max请求地址，对应的domain参数为generalv3.5：
+// wss://spark-api.xf-yun.com/v3.5/chat
+//
+// Spark Pro请求地址，对应的domain参数为generalv3：
+// wss://spark-api.xf-yun.com/v3.1/chat
+//
+// Spark V2.0请求地址，对应的domain参数为generalv2：
+// wss://spark-api.xf-yun.com/v2.1/chat
+//
+// Spark Lite请求地址，对应的domain参数为general：
+// wss://spark-api.xf-yun.com/v1.1/chat
 type AIConfig struct {
-	HostUrl     string  `mapstructure:"host_url"`
+	HostUrl     string  `mapstructure:"host_url"` //访问的地址：
 	AppId       string  `mapstructure:"app_id"`
 	ApiSecret   string  `mapstructure:"api_secret"`
 	ApiKey      string  `mapstructure:"api_key"`
-	Flexibility int     `mapstructure:"flexibility"`
-	Randomness  float64 `mapstructure:"randomness"`
+	Flexibility int     `mapstructure:"flexibility"` //灵活性和topk同义
+	Randomness  float64 `mapstructure:"randomness"`  //随机性和temperature同义
+	MaxTokens   int     `mapstructure:"max_tokens"`  //限制最大token数
+	Domanin     string  `mapstructure:"domain"`      //设置访问的ai版本,有general,generalv2,generalv3,generalv3.5四个版本
 }
 
 type ImageConfig map[string]string

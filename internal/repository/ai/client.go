@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/websocket"
 	"github.com/xissg/online-judge/internal/config"
+	"github.com/xissg/online-judge/internal/constant"
 	"github.com/xissg/online-judge/internal/model/request"
 	"github.com/xissg/online-judge/internal/model/response"
 	"github.com/xissg/online-judge/internal/utils"
@@ -12,11 +13,11 @@ import (
 
 type AIClient struct {
 	conn *websocket.Conn
+	ctx  *request.AI
 }
 
-const NORMAL_RESPONSE_CODE = 101
-
-func NewAIClient(cfg config.AIConfig) *AIClient {
+// option可以指定maxtokens,topk,temperature,domain
+func NewAIClient(cfg config.AIConfig, option ...Option) *AIClient {
 	dialer := websocket.Dialer{
 		HandshakeTimeout: 5 * time.Second,
 	}
@@ -25,48 +26,27 @@ func NewAIClient(cfg config.AIConfig) *AIClient {
 	if err != nil {
 		return nil
 	}
-	if resp.StatusCode != NORMAL_RESPONSE_CODE {
+	if resp.StatusCode != constant.NORMAL_RESPONSE_CODE {
 		return nil
 	}
+
+	ctx := initAIParams(cfg.AppId, option...)
 	return &AIClient{
 		conn: conn,
+		ctx:  ctx,
 	}
 }
 
-// topk灵活度，1-6默认为4,temperature随机性0-1, roleSetting设置ai扮演的角色
-func (c *AIClient) AISetting(appId string, topK int, temperature float64) *request.AI {
-	if topK <= 0 || topK > 6 {
-		topK = 4
+func (c *AIClient) SendMessage(message string) error {
+	text := &request.Text{
+		Role:    constant.USER_ROLE,
+		Content: message,
 	}
-	if temperature <= 0.0 || temperature > 1 {
-		temperature = 0.8
-	}
-	data := &request.AI{
-		Header: &request.Header{
-			AppID: appId,
-		},
-		Parameter: &request.Parameter{
-			Chat: &request.Chat{
-				Domain:      "generalv3.5",
-				Temperature: temperature,
-				TopK:        topK,
-				MaxTokens:   4096,
-			},
-		},
-		Payload: &request.Payload{
-			Message: &request.Message{
-				Text: []*request.Text{},
-			},
-		},
-	}
-	return data
+	c.ctx.Payload.Message.Text = append(c.ctx.Payload.Message.Text, text)
+	return c.conn.WriteJSON(c.ctx)
 }
 
-func (c *AIClient) SendMessage(aiRequest *request.AI) error {
-	return c.conn.WriteJSON(aiRequest)
-}
-
-// staus字段为2时代表数据发送完毕
+// ReadMessage status字段为2时代表数据发送完毕
 func (c *AIClient) ReadMessage() ([]*response.AI, error) {
 	var dataStream []*response.AI
 	for {
@@ -80,7 +60,7 @@ func (c *AIClient) ReadMessage() ([]*response.AI, error) {
 			return nil, err
 		}
 		dataStream = append(dataStream, dataResponse)
-		if dataResponse.Header.Status == 2 {
+		if dataResponse.Header.Status == constant.EOF_RESPONSE_STATUS {
 			c.conn.Close()
 			break
 		}

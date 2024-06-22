@@ -64,9 +64,9 @@ func (s *judgeService) Run(id string) {
 
 	//开始初始化必要信息
 	s.logger.Infof("start init judge context")
-	ctx := initJudgeContext("/app")
-	err = s.receiveSubmit(submitId, ctx)
-	err = s.receiveQuestion(ctx.Question.QuestionId, ctx)
+	ctx := s.initJudgeContext("/app")
+	err = s.getSubmitInfo(submitId, ctx)
+	err = s.getQuestionInfo(ctx.Question.QuestionId, ctx)
 	s.logger.Infof("start init docker image")
 	err = s.chooseImage(ctx)
 	if err != nil {
@@ -96,6 +96,7 @@ func (s *judgeService) Run(id string) {
 		ch <- err
 		close(ch)
 	}()
+
 	//文件清理
 	s.logger.Infof("start remove generated files")
 	err = s.removeFiles(ctx)
@@ -106,7 +107,9 @@ func (s *judgeService) Run(id string) {
 	}
 }
 
-func initJudgeContext(compileDir string) *entity.JudgeContext {
+// 指定docker中编译路径
+func (s *judgeService) initJudgeContext(compileDir string) *entity.JudgeContext {
+	imageList := config.LoadConfig().Images
 	return &entity.JudgeContext{
 		Question: &entity.QuestionContext{
 			Answer:      []string{},
@@ -115,6 +118,7 @@ func initJudgeContext(compileDir string) *entity.JudgeContext {
 		},
 		Config: &entity.ConfigContext{
 			CompileDir: compileDir,
+			ImageList:  imageList,
 		},
 		Result: &entity.ResultContext{
 			Output: []string{},
@@ -124,7 +128,7 @@ func initJudgeContext(compileDir string) *entity.JudgeContext {
 }
 
 // 获取提交信息
-func (s *judgeService) receiveSubmit(submitId int, ctx *entity.JudgeContext) error {
+func (s *judgeService) getSubmitInfo(submitId int, ctx *entity.JudgeContext) error {
 	submitEntity, err := s.submit.GetSubmitById(submitId)
 	if err != nil {
 		return err
@@ -142,7 +146,7 @@ func (s *judgeService) receiveSubmit(submitId int, ctx *entity.JudgeContext) err
 }
 
 // 获取题目信息
-func (s *judgeService) receiveQuestion(questionId int, ctx *entity.JudgeContext) error {
+func (s *judgeService) getQuestionInfo(questionId int, ctx *entity.JudgeContext) error {
 	questionEntity, err := s.question.GetQuestionById(questionId)
 	if err != nil {
 		return err
@@ -159,9 +163,9 @@ func (s *judgeService) receiveQuestion(questionId int, ctx *entity.JudgeContext)
 
 // 根据编程语言选择对应的镜像,本地不存在该镜像则立即拉取镜像
 func (s *judgeService) chooseImage(ctx *entity.JudgeContext) error {
-	appConfig := config.LoadConfig()
-	image := appConfig.Image[ctx.Question.Language]
-	if image == "" {
+	//判断镜像是否存在
+	image, exists := ctx.Config.ImageList[ctx.Question.Language]
+	if !exists {
 		return errors.New("not supported language")
 	}
 
@@ -185,66 +189,28 @@ func (s *judgeService) chooseImage(ctx *entity.JudgeContext) error {
 
 // 生成源码文件和脚本文件
 func (s *judgeService) generateFiles(ctx *entity.JudgeContext) error {
-	absoluteDir := getDirAbsolutePath()
-	//生成文件名
-	sourceFileName, shellFileName, execFileName := generateFileName(ctx.Question)
-	//生成文件路径
-	sourceFilePath := filepath.Join(absoluteDir, sourceFileName)
-	shellFilePath := filepath.Join(absoluteDir, shellFileName)
+	//获取源码和脚本文件本机保存的绝对路径
+	sourceFileDir := getDirAbsolutePath()
+	//根据编程语言生成文件名
+	sourceFileName, scriptFileName, execFileName := generateFileName(ctx.Question)
 
-	//保存文件路径和文件名
-	ctx.Config.SourceFileDir = absoluteDir
-	ctx.Config.SourceFileName = sourceFileName
-	ctx.Config.ShellFileName = shellFileName
-	ctx.Config.ExecFileName = execFileName
-
-	//创建文件
-	fd1, err := os.Create(sourceFilePath)
-	fd2, err := os.Create(shellFilePath)
-	if err != nil {
-		return err
-	}
-
-	defer fd1.Close()
-	defer fd2.Close()
-
-	//写入源码
-	_, err = fd1.WriteString(ctx.Question.Code)
-	if err != nil {
-		os.Remove(sourceFilePath)
-		return err
-	}
-
-	//写入编译脚本命令
+	//生成源码文件路径、脚本文件路径、docker中编译路径、执行路径和脚本文件执行路径
+	sourceFilePath := filepath.Join(sourceFileDir, sourceFileName)
+	scriptFilePath := filepath.Join(sourceFileDir, scriptFileName)
 	compileFilePath := filepath.Join(ctx.Config.CompileDir, sourceFileName)
 	execFilePath := filepath.Join(ctx.Config.CompileDir, execFileName)
+	dockerScriptPath := filepath.Join(ctx.Config.CompileDir, scriptFileName)
 
-	//根据编程语言选择对应的的编译命令和执行方式
-	compileCmd, execCmd := chooseExecCommand(ctx.Question.Language, compileFilePath, execFilePath)
-	if compileCmd == "" && execCmd == "" {
-		return errors.New("not supported language")
-	}
+	//保存文件路径和文件名
+	ctx.Config.SourceFilePath = sourceFilePath
+	ctx.Config.ScriptFilePath = scriptFilePath
+	ctx.Config.CompileFilePath = compileFilePath
+	ctx.Config.ExecFilePath = execFilePath
+	ctx.Config.DockerScriptPath = dockerScriptPath
 
-	//写入编译脚本命令
-	_, err = fd2.WriteString(fmt.Sprintf("#!bin/bash\n"))
-	_, err = fd2.WriteString(compileCmd + "\n")
-
-	//写入代码执行参数,使用分割段来区分多个输入执行的多个输出
-	for i := range ctx.Question.JudgeCase {
-		//多个判题用例分隔起始符
-		_, err = fd2.WriteString(fmt.Sprintf("echo '===%d START==='\n", i))
-
-		//使用管道和echo命令将输入用例输入，使用 -e 选项来解释其中的转义字符
-		_, err = fd2.WriteString(fmt.Sprintf("echo -e \"%s\"| %v\n", ctx.Question.JudgeCase[i], execCmd))
-
-		//多个判题用例结束符
-		_, err = fd2.WriteString(fmt.Sprintf("echo '===%d END==='\n", i))
-		if err != nil {
-			return err
-		}
-	}
+	//生成源码文件和脚本文件
+	err := createFiles(ctx)
 	if err != nil {
-		os.Remove(shellFilePath)
 		return err
 	}
 	return nil
@@ -253,24 +219,25 @@ func (s *judgeService) generateFiles(ctx *entity.JudgeContext) error {
 // 开启容器，将源码和脚本文件复制进docker中执行脚本文件，进行编译执行
 func (s *judgeService) startSandbox(ctx *entity.JudgeContext) error {
 	//设置执行脚本的命令
-	dockerShellPath := filepath.Join(ctx.Config.CompileDir, ctx.Config.ShellFileName)
+	dockerScriptPath := ctx.Config.DockerScriptPath
 	cmds := []string{
-		"/bin/bash", dockerShellPath,
+		"/bin/bash", dockerScriptPath,
 	}
 
-	//复制文件的docker路径
+	//创建docker，指定工作目录和超时时间
 	dstDir := ctx.Config.CompileDir
 	timeOut := time.Second * 10
 	containerId := s.docker.ContainerCreate(ctx.Config.Image, "", dstDir, cmds, timeOut)
-	//源码的文件路径
-	sourceFilePath := filepath.Join(ctx.Config.SourceFileDir, ctx.Config.SourceFileName)
+
+	//复制源码文件
+	sourceFilePath := ctx.Config.SourceFilePath
 	err := s.docker.CopyToContainer(containerId, dstDir, sourceFilePath)
 	if err != nil {
 		return err
 	}
 
-	//shell文件的文件路径
-	shellFilePath := filepath.Join(ctx.Config.SourceFileDir, ctx.Config.ShellFileName)
+	//复制shell文件
+	shellFilePath := ctx.Config.ScriptFilePath
 	err = s.docker.CopyToContainer(containerId, dstDir, shellFilePath)
 	if err != nil {
 		return err
@@ -288,7 +255,18 @@ func (s *judgeService) startSandbox(ctx *entity.JudgeContext) error {
 }
 
 // 获取判题结果,退出码，执行结果，执行时间，内存占用
-func (s *judgeService) getResult(ctx *entity.JudgeContext) (err error) {
+func (s *judgeService) getResult(ctx *entity.JudgeContext) error {
+	//判断docker是否在运行
+	running, err := s.docker.IsContainerRunning(ctx.Config.ContainerId)
+	if err != nil {
+		return err
+	}
+
+	//获取内存信息
+	if running {
+		ctx.Result.MemoryUsage, err = s.docker.ContainerStats(ctx.Config.ContainerId)
+	}
+
 	//等待docker运行结束
 	chanResponse, chanErr := s.docker.ContainerWait(ctx.Config.ContainerId)
 	select {
@@ -296,19 +274,25 @@ func (s *judgeService) getResult(ctx *entity.JudgeContext) (err error) {
 	case <-chanErr:
 		return err
 	}
+
+	//获取退出码和执行时间
 	ctx.Result.ExitCode, ctx.Result.ExecTime = s.docker.ContainerInspect(ctx.Config.ContainerId)
-	ctx.Result.MemoryUsage, err = s.docker.ContainerStats(ctx.Config.ContainerId)
+	if ctx.Result.ExitCode != 0 {
+		return errors.New("compile error")
+	}
+
+	//获取输出结果
 	output, err := s.docker.ContainerLogs(ctx.Config.ContainerId)
 	if err != nil {
-		return
+		return err
 	}
 	//解析输出结果，通过分割符将各个输出单独切割出来
 	result := resultLogProcedure(output, len(ctx.Question.JudgeCase))
 	ctx.Result.Output = result
-	return
+	return err
 }
 
-// 判题服务,通过退出码，执行结果，执行时间占用内存来判断结果
+// 正常判题通过后，会交由ai进行代码优化建议
 func (s *judgeService) judge(ctx *entity.JudgeContext) bool {
 	ok := s.normalJudge(ctx)
 	if ok {
@@ -317,7 +301,7 @@ func (s *judgeService) judge(ctx *entity.JudgeContext) bool {
 	return ok
 }
 
-// 正常判题逻辑：比对答案
+// 判题服务,通过退出码，执行结果，执行时间占用内存来判断结果
 func (s *judgeService) normalJudge(ctx *entity.JudgeContext) bool {
 	var flag bool
 	ctx.Question.Status = constant.FAILED_STATUS
@@ -370,8 +354,8 @@ func (s *judgeService) removeContainer(containerId string) error {
 
 // 删除源码文件和脚本文件
 func (s *judgeService) removeFiles(ctx *entity.JudgeContext) error {
-	sourceFilePath := filepath.Join(ctx.Config.SourceFileDir, ctx.Config.SourceFileName)
-	shellFilePath := filepath.Join(ctx.Config.SourceFileDir, ctx.Config.ShellFileName)
+	sourceFilePath := ctx.Config.SourceFilePath
+	shellFilePath := ctx.Config.ScriptFilePath
 
 	err := os.Remove(sourceFilePath)
 	if err != nil {
@@ -415,50 +399,81 @@ func getDirAbsolutePath() string {
 }
 
 // 生成源码，脚本，执行文件文件名
-func generateFileName(ctx *entity.QuestionContext) (string, string, string) {
+func generateFileName(ctx *entity.QuestionContext) (sourceFileName string, scriptFileName string, compileFileName string) {
 	randomString := utils.GenerateRandomString(16)
-	var compileFileName string
-	switch ctx.Language {
-	case "go", "c", "cpp":
-		compileFileName = randomString
-	case "java":
-		compileFileName = randomString + ".class"
-	case "javascript":
-		compileFileName = randomString + ".js"
-	case "python":
-		compileFileName = randomString + ".py"
+	extensions := map[string]string{
+		"java":       ".class",
+		"javascript": ".js",
+		"python":     ".py",
 	}
-	return fmt.Sprintf("%v.%v", randomString, ctx.Language), randomString + ".sh", compileFileName
+
+	compileFileName = randomString
+	if ext, exists := extensions[ctx.Language]; exists {
+		compileFileName += ext
+	}
+
+	sourceFileName = fmt.Sprintf("%v.%v", randomString, ctx.Language)
+	scriptFileName = randomString + ".sh"
+
+	return
 }
 
-// TODO:待优化
-// 根据不同编程语言选择不同的编译方式和执行方式
-func chooseExecCommand(lan string, filePath string, execPath string) (compileCmd string, execCmd string) {
-	switch lan {
-	case constant.GO_LANGUAGE:
-		compileCmd = fmt.Sprintf("go build  -o %v %v && chmod +x %v", execPath, filePath, execPath)
-		execCmd = fmt.Sprintf("%v", execPath)
+// 根据代码和语言生成对应的源码文件和脚本文件
+func createFiles(ctx *entity.JudgeContext) error {
+	//获取源码文件和脚本文件路径
+	sourceFilePath := ctx.Config.SourceFilePath
+	scriptFilePath := ctx.Config.ScriptFilePath
 
-	case constant.JAVA_LANGUAGE:
-		compileCmd = fmt.Sprintf("javac %v && chmod +x %v", filePath, execPath)
-		execCmd = fmt.Sprintf("java -jar %v", execPath)
-	case constant.PYTHON_LANGUAGE:
-		compileCmd = ""
-		execCmd = fmt.Sprintf("python %v", execPath)
-	case constant.JAVASCRIPT_LANGUAGE:
-		compileCmd = ""
-		execCmd = fmt.Sprintf("node %v", execPath)
-	case constant.CPP_LANGUAGE:
-		compileCmd = fmt.Sprintf("g++ %v -o %v && chmod +x %v", filePath, execPath, execPath)
-		execCmd = fmt.Sprintf("%v\n", execPath)
-	case constant.C_LANGUAGE:
-		compileCmd = fmt.Sprintf("gcc %v -o %v && chmod +x %v", filePath, execPath, execPath)
-		execCmd = fmt.Sprintf("%v", execPath)
-	default:
-		compileCmd = ""
-		execCmd = ""
+	//创建文件
+	fd1, err := os.Create(sourceFilePath)
+	fd2, err := os.Create(scriptFilePath)
+	if err != nil {
+		return err
 	}
-	return
+
+	defer fd1.Close()
+	defer fd2.Close()
+
+	//写入源码
+	_, err = fd1.WriteString(ctx.Question.Code)
+	if err != nil {
+		os.Remove(sourceFilePath)
+		return err
+	}
+
+	//获取编译文件路径和执行文件路径
+	compileFilePath := ctx.Config.CompileFilePath
+	execFilePath := ctx.Config.ExecFilePath
+
+	//根据编程语言选择对应的的编译命令和执行方式
+	compileCmd, execCmd := chooseExecCommand(ctx.Question.Language, compileFilePath, execFilePath)
+	if compileCmd == "" && execCmd == "" {
+		return errors.New("not supported language")
+	}
+
+	//写入编译脚本命令
+	_, err = fd2.WriteString(fmt.Sprintf("#!bin/bash\n"))
+	_, err = fd2.WriteString(compileCmd + "\n")
+
+	//写入代码执行参数,使用分割段来区分多个输入执行的多个输出
+	for i := range ctx.Question.JudgeCase {
+		//多个判题用例分隔起始符
+		_, err = fd2.WriteString(fmt.Sprintf("echo '===%d START==='\n", i))
+
+		//使用管道和echo命令将输入用例输入，使用 -e 选项来解释其中的转义字符
+		_, err = fd2.WriteString(fmt.Sprintf("echo -e \"%s\"| %v\n", ctx.Question.JudgeCase[i], execCmd))
+
+		//多个判题用例结束符
+		_, err = fd2.WriteString(fmt.Sprintf("echo '===%d END==='\n", i))
+		if err != nil {
+			return err
+		}
+	}
+	if err != nil {
+		os.Remove(scriptFilePath)
+		return err
+	}
+	return nil
 }
 
 // 对docker的执行结果进行处理，去除不可见字符
@@ -485,4 +500,50 @@ func resultLogProcedure(out string, length int) []string {
 	}
 
 	return result
+}
+
+type Command struct {
+	Compile string
+	Execute string
+}
+
+// 根据不同编程语言选择不同的编译方式和执行方式
+func chooseExecCommand(lan string, filePath string, execPath string) (compileCmd string, execCmd string) {
+	//使用map进行存储查询，方便扩展
+	commands := map[string]Command{
+		constant.GO_LANGUAGE: {
+			Compile: fmt.Sprintf("go build -o %v %v && chmod +x %v", execPath, filePath, execPath),
+			Execute: fmt.Sprintf("%v", execPath),
+		},
+		constant.JAVA_LANGUAGE: {
+			Compile: fmt.Sprintf("javac %v && chmod +x %v", filePath, execPath),
+			Execute: fmt.Sprintf("java -jar %v", execPath),
+		},
+		constant.PYTHON_LANGUAGE: {
+			Compile: "",
+			Execute: fmt.Sprintf("python %v", execPath),
+		},
+		constant.JAVASCRIPT_LANGUAGE: {
+			Compile: "",
+			Execute: fmt.Sprintf("node %v", execPath),
+		},
+		constant.CPP_LANGUAGE: {
+			Compile: fmt.Sprintf("g++ %v -o %v && chmod +x %v", filePath, execPath, execPath),
+			Execute: fmt.Sprintf("%v", execPath),
+		},
+		constant.C_LANGUAGE: {
+			Compile: fmt.Sprintf("gcc %v -o %v && chmod +x %v", filePath, execPath, execPath),
+			Execute: fmt.Sprintf("%v", execPath),
+		},
+	}
+
+	if cmd, exists := commands[lan]; exists {
+		compileCmd = cmd.Compile
+		execCmd = cmd.Execute
+	} else {
+		compileCmd = ""
+		execCmd = ""
+	}
+
+	return
 }

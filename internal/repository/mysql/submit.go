@@ -31,3 +31,10 @@ func (mysql *MysqlClient) DeleteSubmit(submitId int) error {
 	}
 	return nil
 }
+func (mysql *MysqlClient) GetRecentSubmit(lastUpdateTime string) []*entity.Submit {
+	submitList, err := getRecentData[entity.Submit](mysql, constant.SUBMIT_TABLE, lastUpdateTime)
+	if err != nil {
+		return nil
+	}
+	return submitList
+}

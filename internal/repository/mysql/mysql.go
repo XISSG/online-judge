@@ -59,3 +59,12 @@ func deleteDataById(mysql *MysqlClient, table string, id int) error {
 	tx.Commit()
 	return nil
 }
+
+func getRecentData[T RESPONSE](mysql *MysqlClient, table string, lastUpdateTime string) ([]*T, error) {
+	var t []*T
+	tx := mysql.client.Table(table).Where("is_delete =?", constant.NOT_DELETED).Where("update_time >?", lastUpdateTime).Order("update_time desc").Find(&t)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return t, nil
+}

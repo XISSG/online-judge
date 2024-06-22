@@ -1,4 +1,4 @@
-package scheduler
+package spider
 
 import (
 	"bufio"
@@ -17,8 +17,18 @@ import (
 	"time"
 )
 
+type Spider struct {
+	Path string
+}
+
+func NewSpider(savePath string) *Spider {
+	return &Spider{
+		Path: savePath,
+	}
+}
+
 // 并发爬取
-func ConcurrencyCrawl(totalPage int, savePath string, concurrency int) {
+func (s *Spider) ConcurrencyCrawl(totalPage int, concurrency int) {
 	start := time.Now()
 	var wg sync.WaitGroup
 
@@ -30,7 +40,7 @@ func ConcurrencyCrawl(totalPage int, savePath string, concurrency int) {
 		go func(page int) {
 			defer wg.Done()
 			defer func() { <-ch }()
-			Crawl(page, savePath)
+			s.Crawl(page)
 		}(page)
 	}
 
@@ -41,13 +51,13 @@ func ConcurrencyCrawl(totalPage int, savePath string, concurrency int) {
 }
 
 // 单线程爬取
-func Crawl(page int, savePath string) {
+func (s *Spider) Crawl(page int) {
 	//爬取网页并解析网页
 	images := CrawlWeb(page)
 
 	//下载图片
 	start := time.Now()
-	DownloadAvatar(images, savePath)
+	DownloadAvatar(images, s.Path)
 	duration := time.Since(start)
 	fmt.Printf("page %v , cost time: %v\n", page, duration)
 }
