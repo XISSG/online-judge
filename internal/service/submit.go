@@ -2,12 +2,13 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"github.com/xissg/online-judge/internal/model/entity"
 	"github.com/xissg/online-judge/internal/model/request"
 	"github.com/xissg/online-judge/internal/model/response"
 	"github.com/xissg/online-judge/internal/repository/elastic"
 	"github.com/xissg/online-judge/internal/repository/mysql"
-	"github.com/xissg/online-judge/internal/repository/redis"
+	rdb "github.com/xissg/online-judge/internal/repository/redis"
 	"github.com/xissg/online-judge/internal/utils"
 )
 
@@ -23,10 +24,10 @@ type SubmitService interface {
 type submitService struct {
 	mysql *mysql.MysqlClient
 	es    *elastic.ESClient
-	redis *redis.RedisClient
+	redis *rdb.RedisClient
 }
 
-func NewSubmitService(mysql *mysql.MysqlClient, es *elastic.ESClient, redis *redis.RedisClient) SubmitService {
+func NewSubmitService(mysql *mysql.MysqlClient, es *elastic.ESClient, redis *rdb.RedisClient) SubmitService {
 	return &submitService{
 		mysql: mysql,
 		es:    es,
@@ -37,35 +38,36 @@ func NewSubmitService(mysql *mysql.MysqlClient, es *elastic.ESClient, redis *red
 func (q *submitService) CreateSubmit(submit *request.Submit, userId int) (int, error) {
 	data := utils.ConvertSubmitEntity(submit, userId)
 	if data == nil {
-		return 0, errors.New("data marshalling error")
+		return 0, errors.New("service layer: submit, data marshalling error")
 	}
 
 	err := q.mysql.CreateSubmit(data)
 	resp := utils.ConvertSubmitResponse(data)
 	err = q.es.IndexSubmit(resp)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("service layer: submit -> %w", err)
 	}
 
 	return data.ID, nil
 }
 
 func (q *submitService) SearchSubmit(query string) ([]*response.Submit, error) {
-	submits := q.es.SearchSubmits(query)
-	if submits == nil {
-		return nil, errors.New("not found query submit")
+	submits, err := q.es.SearchSubmits(query)
+	if err != nil {
+		return nil, fmt.Errorf("service layer: submit -> %w", err)
 	}
 	return submits, nil
 }
 
 func (q *submitService) GetSubmitList(page, pageSize int) ([]*response.Submit, error) {
 	var submits []*entity.Submit
+	var err error
 
-	submits = q.redis.GetSubmitList(page, pageSize)
+	submits, err = q.redis.GetSubmitList(page, pageSize)
 	if submits == nil {
-		submits = q.mysql.GetSubmitList(page, pageSize)
-		if submits == nil {
-			return nil, errors.New("not found query submit")
+		submits, err = q.mysql.GetSubmitList(page, pageSize)
+		if err != nil {
+			return nil, fmt.Errorf("service layer: submit -> %w", err)
 		}
 		_ = q.redis.CacheSubmitList(submits)
 	}
@@ -83,13 +85,13 @@ func (q *submitService) UpdateSubmit(submit *request.UpdateSubmit) error {
 	submitEntity := utils.UpdateSubmitToSubmitEntity(submit)
 	err := q.mysql.UpdateSubmit(submitEntity)
 	if err != nil {
-		return nil
+		return fmt.Errorf("service layer: submit -> %w", err)
 	}
 	submitResponse := utils.ConvertSubmitResponse(submitEntity)
 	err = q.es.UpdateSubmit(submitResponse)
 	err = q.redis.DeleteSubmitById(submit.ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer: submit -> %w", err)
 	}
 	return nil
 }
@@ -98,13 +100,16 @@ func (q *submitService) DeleteSubmit(id int) error {
 	err := q.mysql.DeleteSubmit(id)
 	err = q.es.DeleteSubmitById(id)
 	err = q.redis.DeleteSubmitById(id)
-	return err
+	if err != nil {
+		return fmt.Errorf("service layer: submit -> %w", err)
+	}
+	return nil
 }
 
 func (q *submitService) GetSubmitById(id int) (*entity.Submit, error) {
-	res := q.mysql.GetSubmitById(id)
-	if res == nil {
-		return nil, errors.New("not found query submit")
+	res, err := q.mysql.GetSubmitById(id)
+	if err != nil {
+		return nil, fmt.Errorf("service layer: submit -> %w", err)
 	}
 	return res, nil
 }

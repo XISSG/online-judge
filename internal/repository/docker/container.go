@@ -3,17 +3,19 @@ package docker
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/pkg/archive"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
+	"github.com/xissg/online-judge/internal/constant"
 	"io"
 	"time"
 )
 
 // 配置执行命令
-func (docker *DockerClient) ContainerCreate(imageName string, containerName string, workingDir string, cmds []string, timeOut time.Duration) string {
+func (docker *DockerClient) ContainerCreate(imageName string, containerName string, workingDir string, cmds []string, timeOut time.Duration) (string, error) {
 	ctx := context.Background()
 	stopTimeout := new(int)
 	*stopTimeout = int(timeOut)
@@ -32,19 +34,23 @@ func (docker *DockerClient) ContainerCreate(imageName string, containerName stri
 
 	res, err := docker.client.ContainerCreate(ctx, config, hostConfig, networkingConfig, &platform, containerName)
 	if err != nil {
-		return ""
+		return "", fmt.Errorf("repository layer: docker, container create: %w %+v", constant.ErrInternal, err)
 	}
-	return res.ID
+	return res.ID, nil
 }
 
 func (docker *DockerClient) CopyToContainer(containerId string, dstDir string, srcFile string) error {
 	ctx := context.Background()
 	content, err := archive.Tar(srcFile, archive.Uncompressed)
 	if err != nil {
-		return err
+		return fmt.Errorf("repository layer: docker, copy to container; archive.Tar: %w %+v", constant.ErrInternal, err)
 	}
 	options := types.CopyToContainerOptions{}
-	return docker.client.CopyToContainer(ctx, containerId, dstDir, content, options)
+	err = docker.client.CopyToContainer(ctx, containerId, dstDir, content, options)
+	if err != nil {
+		return fmt.Errorf("repository layer: docker, copy to container: %w %+v", constant.ErrInternal, err)
+	}
+	return nil
 }
 
 func (docker *DockerClient) ContainerWait(containerId string) (chanResponse <-chan container.WaitResponse, chanErr <-chan error) {
@@ -55,25 +61,29 @@ func (docker *DockerClient) ContainerWait(containerId string) (chanResponse <-ch
 func (docker *DockerClient) ContainerStart(containerId string) error {
 	ctx := context.Background()
 	options := container.StartOptions{}
-	return docker.client.ContainerStart(ctx, containerId, options)
+	err := docker.client.ContainerStart(ctx, containerId, options)
+	if err != nil {
+		return fmt.Errorf("repository layer: docker, container start: %w %+v", constant.ErrInternal, err)
+	}
+	return nil
 }
 
 // 获取执行时间，退出码等信息
-func (docker *DockerClient) ContainerInspect(containerId string) (int, int64) {
+func (docker *DockerClient) ContainerInspect(containerId string) (exitCode int, execTime int64) {
 	ctx := context.Background()
 	res, err := docker.client.ContainerInspect(ctx, containerId)
 	if err != nil {
 		return 1, 0
 	}
 
-	exitCode := res.State.ExitCode
+	exitCode = res.State.ExitCode
 
 	start := res.State.StartedAt
 	startTime, err := time.Parse(time.RFC3339, start)
 	finish := res.State.FinishedAt
 	endTime, err := time.Parse(time.RFC3339, finish)
 
-	execTime := endTime.Sub(startTime).Milliseconds()
+	execTime = endTime.Sub(startTime).Milliseconds()
 	return exitCode, execTime
 }
 
@@ -90,13 +100,13 @@ func (docker *DockerClient) ContainerLogs(containerId string) (string, error) {
 	}
 	defer resp.Close()
 	if err != nil {
-		panic(err)
+		return "", fmt.Errorf("repository layer: docker, container logs: %w %+v", constant.ErrInternal, err)
 	}
 
 	// 读取容器日志
 	logs, err := io.ReadAll(resp)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("repository layer: docker, container logs;io.ReadAll: %w %+v", constant.ErrInternal, err)
 	}
 
 	return string(logs), err
@@ -107,31 +117,42 @@ func (docker *DockerClient) ContainerStats(containerId string) (uint64, error) {
 	ctx := context.Background()
 	res, err := docker.client.ContainerStats(ctx, containerId, true)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("repository layer: docker, container stats: %w %+v", constant.ErrInternal, err)
 	}
 	defer res.Body.Close()
 	var data types.StatsJSON
 	err = json.NewDecoder(res.Body).Decode(&data)
-	return data.MemoryStats.Usage, err
+	if err != nil {
+		return 0, fmt.Errorf("repository layer: docker, container stats;json.NewDecoder.Decode: %w %+v", constant.ErrInternal, err)
+	}
+	return data.MemoryStats.Usage, nil
 }
 
 func (docker *DockerClient) ContainerStop(containerId string) error {
 	ctx := context.Background()
 	options := container.StopOptions{}
-	return docker.client.ContainerStop(ctx, containerId, options)
+	err := docker.client.ContainerStop(ctx, containerId, options)
+	if err != nil {
+		return fmt.Errorf("repository layer: docker, container stop: %w %+v", constant.ErrInternal, err)
+	}
+	return nil
 }
 
 func (docker *DockerClient) ContainerRemove(containerId string) error {
 	ctx := context.Background()
 	options := container.RemoveOptions{}
-	return docker.client.ContainerRemove(ctx, containerId, options)
+	err := docker.client.ContainerRemove(ctx, containerId, options)
+	if err != nil {
+		return fmt.Errorf("repository layer: docker, container remove: %w %+v", constant.ErrInternal, err)
+	}
+	return nil
 }
 
 func (docker *DockerClient) IsContainerRunning(containerId string) (bool, error) {
 	ctx := context.Background()
 	res, err := docker.client.ContainerInspect(ctx, containerId)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("repository layer: docker, is docker running;container inspect: %w %+v", constant.ErrInternal, err)
 	}
 	return res.State.Running, nil
 }

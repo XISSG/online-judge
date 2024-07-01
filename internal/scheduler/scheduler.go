@@ -28,6 +28,9 @@ type Job struct {
 
 func (s *Scheduler) Start(jobs []Job) {
 	// 添加定时任务
+	if len(jobs) == 0 {
+		return
+	}
 	for _, job := range jobs {
 		_, err := s.crontab.AddFunc(job.ScheduleTime, job.Handler)
 		if err != nil {

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/xissg/online-judge/internal/repository/ai"
 )
 
@@ -21,14 +22,18 @@ func NewAIService(client *ai.AIClient) AIService {
 
 // 发送消息
 func (s *aiService) SendMessage(message string) error {
-	return s.client.SendMessage(message)
+	err := s.client.SendMessage(message)
+	if err != nil {
+		return fmt.Errorf("service layer: ai -> %w", err)
+	}
+	return nil
 }
 
 // 获取接收到的消息
 func (s *aiService) ReceiveMessage() (string, error) {
 	messages, err := s.client.ReadMessage()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("service layer: ai -> %w", err)
 	}
 	res := ""
 	for i := range messages {

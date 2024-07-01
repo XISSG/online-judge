@@ -1,6 +1,8 @@
 package ai
 
-import "github.com/xissg/online-judge/internal/model/request"
+import (
+	"github.com/xissg/online-judge/internal/model/request"
+)
 
 type Option func(ctx *request.AI)
 

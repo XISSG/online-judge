@@ -1,7 +1,9 @@
 package service
 
 import (
+	"fmt"
 	"github.com/xissg/online-judge/internal/repository/rabbitmq"
+	"log"
 )
 
 type RabbitMqService interface {
@@ -24,7 +26,10 @@ func (s *rabbitmqService) Publish(message string) error {
 	err := s.rabbitMqClient.ExchangeDeclare()
 	err = s.rabbitMqClient.Publish(message)
 	defer s.rabbitMqClient.Close()
-	return err
+	if err != nil {
+		return fmt.Errorf("service layer: rabbitmq -> %w", err)
+	}
+	return nil
 }
 
 type HandlerFunc func(string)
@@ -34,7 +39,7 @@ func (s *rabbitmqService) Consume(handler HandlerFunc) {
 	err = s.rabbitMqClient.QueueDeclareAndBind()
 	msgs, err := s.rabbitMqClient.Consume()
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 	forever := make(chan struct{})
 	go func() {

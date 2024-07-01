@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/xissg/online-judge/internal/model/entity"
 	"github.com/xissg/online-judge/internal/model/request"
 	"github.com/xissg/online-judge/internal/model/response"
@@ -11,9 +12,9 @@ import (
 
 type UserService interface {
 	CreateUser(userRequest *request.User) error
-	GetUserById(userId int) *response.User
-	GetUserByUsername(username string) *response.User
-	GetUserListByUsername(username string) []*response.User
+	GetUserById(userId int) (*response.User, error)
+	GetUserByUsername(username string) (*response.User, error)
+	GetUserListByUsername(username string) ([]*response.User, error)
 	UpdateUserPassword(userId int, password string) error
 	UpdateUserAvatar(userId int, avatar string) error
 	DeleteUserById(userId int) error
@@ -36,32 +37,32 @@ func (s *userService) CreateUser(userRequest *request.User) error {
 	user := utils.ConvertUserEntity(userRequest)
 	err := s.mysql.CreateUser(user)
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer: user -> %w", err)
 	}
 	return nil
 }
 
-func (s *userService) GetUserById(userId int) *response.User {
-	user := s.mysql.GetUserById(userId)
-	if user == nil {
-		return nil
+func (s *userService) GetUserById(userId int) (*response.User, error) {
+	user, err := s.mysql.GetUserById(userId)
+	if err != nil {
+		return nil, fmt.Errorf("service layer: user -> %w", err)
 	}
 	userResponse := utils.ConvertUserResponse(user)
-	return userResponse
+	return userResponse, nil
 }
-func (s *userService) GetUserByUsername(username string) *response.User {
-	user := s.mysql.GetUserByName(username)
-	if user == nil {
-		return nil
+func (s *userService) GetUserByUsername(username string) (*response.User, error) {
+	user, err := s.mysql.GetUserByName(username)
+	if err != nil {
+		return nil, fmt.Errorf("service layer: user -> %w", err)
 	}
-	return utils.ConvertUserResponse(user)
+	return utils.ConvertUserResponse(user), nil
 }
 
-func (s *userService) GetUserListByUsername(username string) []*response.User {
+func (s *userService) GetUserListByUsername(username string) ([]*response.User, error) {
 	var userResponses []*response.User
-	users := s.mysql.GetUserListByName(username)
-	if len(users) == 0 {
-		return nil
+	users, err := s.mysql.GetUserListByName(username)
+	if err != nil {
+		return nil, fmt.Errorf("service layer: user -> %w", err)
 	}
 
 	for i := range users {
@@ -69,7 +70,7 @@ func (s *userService) GetUserListByUsername(username string) []*response.User {
 		userResponses = append(userResponses, userResponse)
 	}
 
-	return userResponses
+	return userResponses, nil
 }
 
 func (s *userService) UpdateUserPassword(userId int, password string) error {
@@ -81,7 +82,7 @@ func (s *userService) UpdateUserPassword(userId int, password string) error {
 	}
 	err := s.mysql.UpdateUser(user)
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer: user -> %w", err)
 	}
 	return nil
 }
@@ -94,7 +95,7 @@ func (s *userService) UpdateUserAvatar(userId int, avatar string) error {
 	}
 	err := s.mysql.UpdateUser(user)
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer: user -> %w", err)
 	}
 	return nil
 }
@@ -102,7 +103,7 @@ func (s *userService) UpdateUserAvatar(userId int, avatar string) error {
 func (s *userService) DeleteUserById(userId int) error {
 	err := s.mysql.DeleteUser(userId)
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer: user -> %w", err)
 	}
 	return nil
 }
@@ -110,14 +111,14 @@ func (s *userService) DeleteUserById(userId int) error {
 func (s *userService) BanUserById(userId int) error {
 	err := s.mysql.BanUser(userId)
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer: user -> %w", err)
 	}
 	return nil
 }
 
 func (s *userService) CheckUserNameAndPasswd(userName, password string) (bool, int, string) {
-	user := s.mysql.GetUserByName(userName)
-	if user == nil {
+	user, err := s.mysql.GetUserByName(userName)
+	if user == nil || err != nil {
 		return false, 0, ""
 	}
 	if utils.MD5Crypt(password) != user.UserPassword {
@@ -127,8 +128,8 @@ func (s *userService) CheckUserNameAndPasswd(userName, password string) (bool, i
 }
 
 func (s *userService) CheckUserExists(userName string) bool {
-	user := s.mysql.GetUserByName(userName)
-	if user == nil {
+	user, err := s.mysql.GetUserByName(userName)
+	if user == nil || err != nil {
 		return false
 	}
 	return true

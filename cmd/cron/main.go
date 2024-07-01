@@ -16,16 +16,16 @@ func main() {
 
 	jobs := []scheduler.Job{
 		{
-			ScheduleTime: "monthly",
+			ScheduleTime: "@monthly",
 			Handler:      CrawlAvatar,
 		},
 		{
 
-			ScheduleTime: "weekly",
+			ScheduleTime: "@weekly",
 			Handler:      question.SyncData,
 		},
 		{
-			ScheduleTime: "weekly",
+			ScheduleTime: "@weekly",
 			Handler:      submit.SyncData,
 		},
 	}

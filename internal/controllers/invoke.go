@@ -42,7 +42,7 @@ func (h *InvokeHandler) GetInvokeCount(ctx *gin.Context) {
 	invokeInfo := request.Invoke{}
 	err := ctx.ShouldBindJSON(&invokeInfo)
 	if err != nil {
-		h.logger.Infof("invalid invoke information")
+		h.logger.Infof("invalid invoke information %v", err)
 		ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "invalid invoke information"))
 		return
 	}
@@ -50,7 +50,7 @@ func (h *InvokeHandler) GetInvokeCount(ctx *gin.Context) {
 	//校验数据
 	err = h.validator.Struct(invokeInfo)
 	if err != nil {
-		h.logger.Infof("invalid invoke information")
+		h.logger.Infof("invalid invoke information %v", err)
 		ctx.JSON(http.StatusBadRequest, middlewares.ErrorResponse(http.StatusBadRequest, "invalid invoke information"))
 		return
 	}
@@ -59,7 +59,7 @@ func (h *InvokeHandler) GetInvokeCount(ctx *gin.Context) {
 	key := fmt.Sprintf("invoke:%s:%s", invokeInfo.Method, invokeInfo.Path)
 	data, err := h.rdb.HGetAll(key)
 	if err != nil {
-		h.logger.Infof("failed to get invoke count")
+		h.logger.Infof("failed to get invoke count %v", err)
 		ctx.JSON(http.StatusInternalServerError, middlewares.ErrorResponse(http.StatusInternalServerError, "failed to get invoke count"))
 		return
 	}

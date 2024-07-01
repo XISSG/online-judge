@@ -20,22 +20,24 @@ func createData[T RESPONSE](mysql *MysqlClient, table string, t *T) error {
 	return nil
 }
 
-func getDataById[T RESPONSE](mysql *MysqlClient, table string, id int) *T {
+func getDataById[T RESPONSE](mysql *MysqlClient, table string, id int) (*T, error) {
 	var t T
+	var err error
 	tx := mysql.client.Table(table).Where("id = ?", id).First(&t)
 	if tx.Error != nil {
-		return nil
+		return nil, err
 	}
-	return &t
+	return &t, nil
 }
 
-func getDataList[T RESPONSE](mysql *MysqlClient, table string, page int, pageSize int) []*T {
+func getDataList[T RESPONSE](mysql *MysqlClient, table string, page int, pageSize int) ([]*T, error) {
 	var t []*T
+	var err error
 	tx := mysql.client.Table(table).Where("is_delete =?", constant.NOT_DELETED).Order("update_time desc").Offset((page - 1) * pageSize).Limit(pageSize).Find(&t)
 	if tx.Error != nil {
-		return nil
+		return nil, err
 	}
-	return t
+	return t, nil
 }
 
 func updateDataById[T RESPONSE](mysql *MysqlClient, table string, id int, t *T) error {

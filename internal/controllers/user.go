@@ -156,14 +156,20 @@ func (r *UserHandler) GetUserList(ctx *gin.Context) {
 			return
 		}
 		//获取数据并返回
-		user := r.userService.GetUserById(id)
+		user, err := r.userService.GetUserById(id)
+		if err != nil {
+			r.logger.Errorf("Get user by id error: %v", err)
+		}
 		ctx.Set("data", user)
 		return
 	}
 
 	if name != "" {
 		//获取数据并返回
-		users := r.userService.GetUserListByUsername(name)
+		users, err := r.userService.GetUserListByUsername(name)
+		if err != nil {
+			r.logger.Errorf("Get user by name error: %v", err)
+		}
 		ctx.Set("data", users)
 		return
 	}

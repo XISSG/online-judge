@@ -45,11 +45,19 @@ func NewJudgeService(docker *docker.DockerClient, question QuestionService, subm
 
 func (s *judgeService) Run(id string) {
 	var err error
-	submitId, _ := strconv.Atoi(id)
+	submitId, err := strconv.Atoi(id)
+	if err != nil {
+		s.logger.Errorf("Invalid submit ID: %s", id)
+		return
+	}
 
 	//判题校验，已判题或正在判题的直接返回
 	s.logger.Infof("start judge service")
-	submit, _ := s.submit.GetSubmitById(submitId)
+	submit, err := s.submit.GetSubmitById(submitId)
+	if err != nil || submit == nil {
+		s.logger.Errorf("Failed to get submit by ID: %d, error: %v", submitId, err)
+		return
+	}
 	if submit.Status != constant.WATING_STATUS {
 		s.logger.Infof("already judged, status: %v", submit.Status)
 		return
@@ -64,12 +72,17 @@ func (s *judgeService) Run(id string) {
 
 	//开始初始化必要信息
 	s.logger.Infof("start init judge context")
-	ctx := s.initJudgeContext("/app")
+	ctx, err := s.initJudgeContext("/app")
+	if err != nil {
+		s.logger.Errorf("%v", err)
+		return
+	}
 	err = s.getSubmitInfo(submitId, ctx)
 	err = s.getQuestionInfo(ctx.Question.QuestionId, ctx)
 	s.logger.Infof("start init docker image")
 	err = s.chooseImage(ctx)
 	if err != nil {
+		s.logger.Errorf("%v", err)
 		return
 	}
 
@@ -81,6 +94,7 @@ func (s *judgeService) Run(id string) {
 	s.logger.Infof("start get result")
 	err = s.getResult(ctx)
 	if err != nil {
+		s.logger.Errorf("%v", err)
 		return
 	}
 
@@ -88,27 +102,28 @@ func (s *judgeService) Run(id string) {
 	s.logger.Infof("start judge")
 	ok := s.judge(ctx)
 
+	//更新结果
 	s.logger.Infof("start store judge result")
-	ch := make(chan error)
-	go func() {
-		//更新结果
-		err = s.storeJudgeResults(ok, ctx)
-		ch <- err
-		close(ch)
-	}()
+	err = s.storeJudgeResults(ok, ctx)
+	if err != nil {
+		s.logger.Errorf("Failed to store judge results: %v", err)
+		return
+	}
 
 	//文件清理
 	s.logger.Infof("start remove generated files")
 	err = s.removeFiles(ctx)
 	err = s.removeContainer(ctx.Config.ContainerId)
-	err = <-ch
 	if err != nil {
-		return
+		s.logger.Errorf("%v", err)
 	}
 }
 
 // 指定docker中编译路径
-func (s *judgeService) initJudgeContext(compileDir string) *entity.JudgeContext {
+func (s *judgeService) initJudgeContext(compileDir string) (*entity.JudgeContext, error) {
+	if compileDir == "" {
+		return nil, fmt.Errorf("service layer:judge,init judge context, %w", constant.ErrInvalidFilePath)
+	}
 	imageList := config.LoadConfig().Images
 	return &entity.JudgeContext{
 		Question: &entity.QuestionContext{
@@ -123,7 +138,7 @@ func (s *judgeService) initJudgeContext(compileDir string) *entity.JudgeContext 
 		Result: &entity.ResultContext{
 			Output: []string{},
 		},
-	}
+	}, nil
 
 }
 
@@ -131,10 +146,13 @@ func (s *judgeService) initJudgeContext(compileDir string) *entity.JudgeContext 
 func (s *judgeService) getSubmitInfo(submitId int, ctx *entity.JudgeContext) error {
 	submitEntity, err := s.submit.GetSubmitById(submitId)
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer:judge -> %w", err)
 	}
 	submitResponse := utils.ConvertSubmitResponse(submitEntity)
 
+	if submitResponse == nil {
+		return errors.New("service layer:judge, submit response convert error")
+	}
 	ctx.Question.SubmitId = submitId
 	ctx.Question.QuestionId = submitEntity.QuestionId
 	ctx.Question.Language = strings.ToLower(submitEntity.Language)
@@ -149,10 +167,12 @@ func (s *judgeService) getSubmitInfo(submitId int, ctx *entity.JudgeContext) err
 func (s *judgeService) getQuestionInfo(questionId int, ctx *entity.JudgeContext) error {
 	questionEntity, err := s.question.GetQuestionById(questionId)
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer:judge -> %w", err)
 	}
 	questionResponse := utils.ConvertQuestionResponse(questionEntity)
-
+	if questionResponse == nil {
+		return errors.New("service layer:judge, question response convert error")
+	}
 	ctx.Question.Title = questionEntity.Title
 	ctx.Question.Content = questionEntity.Content
 	ctx.Question.Answer = questionResponse.Answer
@@ -166,11 +186,14 @@ func (s *judgeService) chooseImage(ctx *entity.JudgeContext) error {
 	//判断镜像是否存在
 	image, exists := ctx.Config.ImageList[ctx.Question.Language]
 	if !exists {
-		return errors.New("not supported language")
+		return fmt.Errorf("service layer: judge, unsupported language")
 	}
 
 	var flag bool
-	imageList := s.docker.ImageList()
+	imageList, err := s.docker.ImageList()
+	if err != nil {
+		return fmt.Errorf("service layer:judge -> %w", err)
+	}
 	for _, img := range imageList {
 		if img == image {
 			flag = true
@@ -180,7 +203,10 @@ func (s *judgeService) chooseImage(ctx *entity.JudgeContext) error {
 	}
 
 	if flag == false {
-		s.docker.ImagePull(image)
+		err = s.docker.ImagePull(image)
+		if err != nil {
+			return fmt.Errorf("service layer:judge -> %w", err)
+		}
 	}
 
 	ctx.Config.Image = image
@@ -211,7 +237,7 @@ func (s *judgeService) generateFiles(ctx *entity.JudgeContext) error {
 	//生成源码文件和脚本文件
 	err := createFiles(ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer:judge -> %w", err)
 	}
 	return nil
 }
@@ -227,26 +253,29 @@ func (s *judgeService) startSandbox(ctx *entity.JudgeContext) error {
 	//创建docker，指定工作目录和超时时间
 	dstDir := ctx.Config.CompileDir
 	timeOut := time.Second * 10
-	containerId := s.docker.ContainerCreate(ctx.Config.Image, "", dstDir, cmds, timeOut)
+	containerId, err := s.docker.ContainerCreate(ctx.Config.Image, "", dstDir, cmds, timeOut)
+	if err != nil {
+		return fmt.Errorf("service layer:judge -> %w", err)
+	}
 
 	//复制源码文件
 	sourceFilePath := ctx.Config.SourceFilePath
-	err := s.docker.CopyToContainer(containerId, dstDir, sourceFilePath)
+	err = s.docker.CopyToContainer(containerId, dstDir, sourceFilePath)
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer:judge -> %w", err)
 	}
 
 	//复制shell文件
 	shellFilePath := ctx.Config.ScriptFilePath
 	err = s.docker.CopyToContainer(containerId, dstDir, shellFilePath)
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer:judge -> %w", err)
 	}
 
 	//开启docker
 	err = s.docker.ContainerStart(containerId)
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer:judge -> %w", err)
 	}
 
 	//保存docker ID
@@ -259,12 +288,15 @@ func (s *judgeService) getResult(ctx *entity.JudgeContext) error {
 	//判断docker是否在运行
 	running, err := s.docker.IsContainerRunning(ctx.Config.ContainerId)
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer:judge -> %w", err)
 	}
 
 	//获取内存信息
 	if running {
 		ctx.Result.MemoryUsage, err = s.docker.ContainerStats(ctx.Config.ContainerId)
+		if err != nil {
+			return fmt.Errorf("service layer:judge -> %w", err)
+		}
 	}
 
 	//等待docker运行结束
@@ -272,19 +304,19 @@ func (s *judgeService) getResult(ctx *entity.JudgeContext) error {
 	select {
 	case <-chanResponse:
 	case <-chanErr:
-		return err
+		return fmt.Errorf("service layer:judge -> %w", err)
 	}
 
 	//获取退出码和执行时间
 	ctx.Result.ExitCode, ctx.Result.ExecTime = s.docker.ContainerInspect(ctx.Config.ContainerId)
 	if ctx.Result.ExitCode != 0 {
-		return errors.New("compile error")
+		return fmt.Errorf("service layer:judge, user code compile error %w", constant.ErrCompile)
 	}
 
 	//获取输出结果
 	output, err := s.docker.ContainerLogs(ctx.Config.ContainerId)
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer:judge -> %w", err)
 	}
 	//解析输出结果，通过分割符将各个输出单独切割出来
 	result := resultLogProcedure(output, len(ctx.Question.JudgeCase))
@@ -296,7 +328,7 @@ func (s *judgeService) getResult(ctx *entity.JudgeContext) error {
 func (s *judgeService) judge(ctx *entity.JudgeContext) bool {
 	ok := s.normalJudge(ctx)
 	if ok {
-		s.aiSuggestion(ctx)
+		_ = s.aiSuggestion(ctx)
 	}
 	return ok
 }
@@ -338,10 +370,13 @@ func (s *judgeService) aiSuggestion(ctx *entity.JudgeContext) error {
 	roleStr := "现在你是一位算法工程师，你将根据后面的题目的描述信息和实现代码，从时间复杂度和空间复杂度对代码做出评价，并给出代码的优化思路建议。对于接下来我给出的题目描述信息和题目实现代码，请严格按照如下格式给出回复(待优化代码和优化建议需要根据实际代码进行替换)：\n代码时间复杂度：xxx，空间复杂度：xxx。\n待优化代码：第x行到第x行：a=b;\n c = a;\n优化建议：c=b 直接将b赋值给c减少内存拷贝\n"
 	judgeCase, _ := json.Marshal(ctx.Question.JudgeCase)
 	msg := roleStr + "\n" + "题目标题：" + ctx.Question.Title + "\n" + ctx.Question.Content + string(judgeCase) + "\n" + "实现代码：" + ctx.Question.Code + "\n"
-	s.ai.SendMessage(msg)
+	err := s.ai.SendMessage(msg)
+	if err != nil {
+		return fmt.Errorf("service layer:judge -> %w", err)
+	}
 	resp, err := s.ai.ReceiveMessage()
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer:judge -> %w", err)
 	}
 	ctx.Question.JudgeResult = resp
 	return nil
@@ -359,11 +394,11 @@ func (s *judgeService) removeFiles(ctx *entity.JudgeContext) error {
 
 	err := os.Remove(sourceFilePath)
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer:judge -> %w", err)
 	}
 	err = os.Remove(shellFilePath)
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer:judge -> %w", err)
 	}
 	return nil
 }
@@ -377,7 +412,7 @@ func (s *judgeService) storeJudgeResults(ok bool, ctx *entity.JudgeContext) (err
 	}
 
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer:judge -> %w", err)
 	}
 	updateEntity := &request.UpdateSubmit{
 
@@ -386,7 +421,11 @@ func (s *judgeService) storeJudgeResults(ok bool, ctx *entity.JudgeContext) (err
 		Status:      ctx.Question.Status,
 	}
 
-	return s.submit.UpdateSubmit(updateEntity)
+	err = s.submit.UpdateSubmit(updateEntity)
+	if err != nil {
+		return fmt.Errorf("service layer:judge -> %w", err)
+	}
+	return nil
 }
 
 // 获取绝对路径
@@ -428,7 +467,7 @@ func createFiles(ctx *entity.JudgeContext) error {
 	fd1, err := os.Create(sourceFilePath)
 	fd2, err := os.Create(scriptFilePath)
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer: judge, creating file error %w", constant.ErrCreateFile)
 	}
 
 	defer fd1.Close()
@@ -438,7 +477,7 @@ func createFiles(ctx *entity.JudgeContext) error {
 	_, err = fd1.WriteString(ctx.Question.Code)
 	if err != nil {
 		os.Remove(sourceFilePath)
-		return err
+		return fmt.Errorf("service layer:judge -> %w", err)
 	}
 
 	//获取编译文件路径和执行文件路径
@@ -471,7 +510,7 @@ func createFiles(ctx *entity.JudgeContext) error {
 	}
 	if err != nil {
 		os.Remove(scriptFilePath)
-		return err
+		return fmt.Errorf("service layer:judge -> %w", err)
 	}
 	return nil
 }

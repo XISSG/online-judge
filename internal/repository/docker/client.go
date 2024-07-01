@@ -19,7 +19,7 @@ func NewDockerClient() *DockerClient {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(res.APIVersion)
+	fmt.Println("docker version:",res.APIVersion)
 	return &DockerClient{
 		client: cli,
 	}

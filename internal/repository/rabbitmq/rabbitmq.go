@@ -1,11 +1,13 @@
 package rabbitmq
 
 import (
+	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/xissg/online-judge/internal/constant"
 )
 
 func (c *RabbitMQClient) ExchangeDeclare() error {
-	return c.channel.ExchangeDeclare(
+	err := c.channel.ExchangeDeclare(
 		c.ctx.exchangeName,
 		c.ctx.exchangeType,
 		true,
@@ -14,10 +16,14 @@ func (c *RabbitMQClient) ExchangeDeclare() error {
 		false,
 		nil,
 	)
+	if err != nil {
+		return fmt.Errorf("repository layer: rabbitmq, exchange declare: %w %+v", constant.ErrInternal, err)
+	}
+	return nil
 }
 
 func (c *RabbitMQClient) Publish(message string) error {
-	return c.channel.Publish(
+	err := c.channel.Publish(
 		c.ctx.exchangeName,
 		c.ctx.routingKey,
 		false,
@@ -26,6 +32,10 @@ func (c *RabbitMQClient) Publish(message string) error {
 			ContentType: "text/plain",
 			Body:        []byte(message),
 		})
+	if err != nil {
+		return fmt.Errorf("repository layer: rabbitmq, publish: %w %+v", constant.ErrInternal, err)
+	}
+	return nil
 }
 
 func (c *RabbitMQClient) QueueDeclareAndBind() error {
@@ -38,7 +48,7 @@ func (c *RabbitMQClient) QueueDeclareAndBind() error {
 		nil,
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("repository layer: rabbitmq, queue declare: %w %+v", constant.ErrInternal, err)
 	}
 	err = c.channel.QueueBind(
 		q.Name,
@@ -48,7 +58,7 @@ func (c *RabbitMQClient) QueueDeclareAndBind() error {
 		nil,
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("repository layer: rabbitmq, queue bind: %w %+v", constant.ErrInternal, err)
 	}
 	return nil
 }
@@ -62,10 +72,16 @@ func (c *RabbitMQClient) Consume() (<-chan amqp.Delivery, error) {
 		false,
 		nil,
 	)
+	if err != nil {
+		return nil, fmt.Errorf("repository layer: rabbitmq, consume: %w %+v", constant.ErrInternal, err)
+	}
 	return msgs, err
 }
 func (c *RabbitMQClient) Close() error {
 	err := c.conn.Close()
 	err = c.channel.Close()
-	return err
+	if err != nil {
+		return fmt.Errorf("repository layer: rabbitmq,conn and channel close: %w %+v", constant.ErrInternal, err)
+	}
+	return nil
 }

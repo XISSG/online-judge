@@ -26,8 +26,8 @@ func NewQuestionSync(esConfig config.ElasticsearchConfig, mysqlConfig config.Dat
 
 func (q *Question) SyncData() {
 
-	questions := q.mysql.GetRecentQuestion(q.lastUpdateTime)
-	if questions == nil {
+	questions, err := q.mysql.GetRecentQuestion(q.lastUpdateTime)
+	if err != nil {
 		return
 	}
 	for _, question := range questions {

@@ -25,8 +25,8 @@ func NewSubmitSync(esConfig config.ElasticsearchConfig, mysqlConfig config.Datab
 }
 
 func (s *Submit) SyncData() {
-	submits := s.mysql.GetRecentSubmit(s.lastUpdateTime)
-	if submits == nil {
+	submits, err := s.mysql.GetRecentSubmit(s.lastUpdateTime)
+	if err != nil {
 		return
 	}
 	for _, submit := range submits {

@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"github.com/xissg/online-judge/internal/model/entity"
 	"github.com/xissg/online-judge/internal/model/request"
 	"github.com/xissg/online-judge/internal/model/response"
@@ -39,7 +40,7 @@ func NewQuestionService(mysql *mysql.MysqlClient, es *elastic.ESClient, redis *r
 func (q *questionService) CreateQuestion(question *request.Question, userId int) error {
 	data := utils.ConvertQuestionEntity(question, userId)
 	if data == nil {
-		return errors.New("data marshalling error")
+		return errors.New("service layer: question, data marshalling error")
 	}
 	err := q.mysql.CreateQuestion(data)
 	if err != nil {
@@ -47,25 +48,29 @@ func (q *questionService) CreateQuestion(question *request.Question, userId int)
 	}
 	resp := utils.ConvertQuestionResponse(data)
 	err = q.es.IndexQuestion(resp)
-	return err
+	if err != nil {
+		return fmt.Errorf("service layer: question -> %w", err)
+	}
+	return nil
 }
 
 func (q *questionService) SearchQuestion(query string) ([]*response.Question, error) {
-	questions := q.es.SearchQuestions(query)
-	if questions == nil {
-		return nil, errors.New("not found query question")
+	questions, err := q.es.SearchQuestions(query)
+	if err != nil {
+		return nil, fmt.Errorf("service layer: question -> %w", err)
 	}
 	return questions, nil
 }
 
 func (q *questionService) GetQuestionList(page, pageSize int) ([]*response.Question, error) {
 	var questions []*entity.Question
+	var err error
 
-	questions = q.redis.GetQuestionList(page, pageSize)
+	questions, err = q.redis.GetQuestionList(page, pageSize)
 	if questions == nil {
-		questions = q.mysql.GetQuestionList(page, pageSize)
+		questions, err = q.mysql.GetQuestionList(page, pageSize)
 		if questions == nil {
-			return nil, errors.New("not found query question")
+			return nil, fmt.Errorf("service layer: question -> %w", err)
 		}
 		_ = q.redis.CacheQuestionList(questions)
 	}
@@ -83,13 +88,13 @@ func (q *questionService) UpdateQuestion(question *request.UpdateQuestion) error
 	questionEntity := utils.UpdateQuestionToQuestionEntity(question)
 	err := q.mysql.UpdateQuestion(questionEntity)
 	if err != nil {
-		return nil
+		return fmt.Errorf("service layer: question -> %w", err)
 	}
 	questionResponse := utils.ConvertQuestionResponse(questionEntity)
 	err = q.es.UpdateQuestion(questionResponse)
 	err = q.redis.DeleteQuestionById(question.ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("service layer: question -> %w", err)
 	}
 	return nil
 }
@@ -98,31 +103,48 @@ func (q *questionService) DeleteQuestion(id int) error {
 	err := q.mysql.DeleteQuestion(id)
 	err = q.es.DeleteQuestionById(id)
 	err = q.redis.DeleteQuestionById(id)
-	return err
+	if err != nil {
+		return fmt.Errorf("service layer: question -> %w", err)
+	}
+	return nil
 }
 func (q *questionService) UpdateQuestionAcceptNum(id int) error {
-	questionEntity := q.mysql.GetQuestionById(id)
+	questionEntity, err := q.mysql.GetQuestionById(id)
+	if err != nil {
+		return fmt.Errorf("service layer: question -> %w", err)
+	}
 	updateRequest := &request.UpdateQuestion{
 		ID:        id,
 		AcceptNum: questionEntity.AcceptNum + 1,
 		SubmitNum: questionEntity.SubmitNum + 1,
 	}
-	return q.UpdateQuestion(updateRequest)
+	err = q.UpdateQuestion(updateRequest)
+	if err != nil {
+		return fmt.Errorf("service layer: question -> %w", err)
+	}
+	return nil
 }
 
 func (q *questionService) UpdateQuestionSubmitNum(id int) error {
-	questionEntity := q.mysql.GetQuestionById(id)
+	questionEntity, err := q.mysql.GetQuestionById(id)
+	if err != nil {
+		return fmt.Errorf("service layer: question -> %w", err)
+	}
 	updateRequest := &request.UpdateQuestion{
 		ID:        id,
 		SubmitNum: questionEntity.SubmitNum + 1,
 	}
-	return q.UpdateQuestion(updateRequest)
+	err = q.UpdateQuestion(updateRequest)
+	if err != nil {
+		return fmt.Errorf("service layer: question -> %w", err)
+	}
+	return nil
 }
 
 func (q *questionService) GetQuestionById(id int) (*entity.Question, error) {
-	questionEntity := q.mysql.GetQuestionById(id)
-	if questionEntity == nil {
-		return nil, errors.New("not found question")
+	questionEntity, err := q.mysql.GetQuestionById(id)
+	if err != nil {
+		return nil, fmt.Errorf("service layer: question -> %w", err)
 	}
 	return questionEntity, nil
 }
