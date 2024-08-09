@@ -1,4 +1,7 @@
 ## 在线判题系统（online judge）后端
+### 流程图
+![image](https://github.com/user-attachments/assets/d4b68cea-0c5f-40d0-8e9e-52287d93ba41)
+
 ### 业务划分
 用户模块、题目模块、题目提交、判题模块、代码沙箱、定时数据同步、定时爬虫、接口调用统计
 ### 使用技术
